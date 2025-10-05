@@ -1,0 +1,105 @@
+---
+import { fetchEvents } from '../../services/api.js';
+
+interface EventoMapeado {
+  id: string;
+  title: string;
+  start: string;
+  description: string;
+  tag: string;
+  campus: string;
+  extendedProps: {
+    startDay: string;
+    startHour: string;
+    endHour: string;
+    inversion: string;
+    createdAt: string;
+    sedes: any[];
+  };
+}
+
+
+function limpiarHTML(html: string): string {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+
+const eventosData: EventoMapeado[] = await fetchEvents() || [];
+
+
+console.log('=== DEBUG EVENTOS ===');
+console.log('Datos de eventos:', eventosData);
+console.log('Cantidad de eventos:', eventosData.length);
+
+
+const eventos = eventosData.slice(0, 2).map(evento => {
+  const fecha = new Date(evento.start);
+  const dia = fecha.getDate().toString().padStart(2, '0');
+  const mes = fecha.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase();
+  
+  return {
+    fecha: dia,
+    mes: mes,
+    titulo: evento.title,
+    descripcion: limpiarHTML(evento.description) || 'Sin descripción',
+    link: '#',
+    hora: `${evento.extendedProps.startHour || 'TBD'} | ${evento.campus || 'Sede por definir'} | ${evento.extendedProps.startDay || fecha.toLocaleDateString('es-ES')}`,
+    color: 'green',
+    tag: evento.tag || 'Sin categoría',
+  };
+});
+
+console.log('Eventos mapeados:', eventos);
+console.log('Cantidad de eventos mapeados:', eventos.length);
+
+
+const hayEventos = eventos.length > 0;
+console.log('¿Hay eventos válidos?', hayEventos);
+---
+
+{hayEventos ? (
+  <section class="flex flex-col items-start gap-4 px-2 py-8 mx-auto lg:flex-row lg:w-[67%] lg:gap-8 w-11/12">
+    <div class="min-w-[250px] w-full mb-6 lg:mb-0 lg:w-1/4">
+     <div class="flex flex-row gap-8 lg:gap-2 lg:flex-col">
+      <h2 class="mb-2 text-xs font-medium leading-tight lg:text-2xl text-verdeArk font-akira-bold">Nuestros<br />eventos</h2>
+      <p class="mb-8 lg:text-[15px] text-gray-700">Entérate de todos nuestros seminarios, charlas y eventos que transformarán tu conocimiento.</p>
+    
+     </div>
+    <div class="flex flex-row items-center gap-2">
+        <label class="block mb-2 text-sm text-gray-700">Filtrar por:</label>
+        <select class="text-gray-700 border border-gray-300 button-cortado-sm font-akira-bold lg:!p-0 lg:!px-2 lg:!py-2">
+          <option>Todos</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex flex-col flex-1 w-full gap-4 lg:gap-8 lg:w-3/4">
+      {eventos.map(evento => (
+        <div class="flex items-start gap-6">
+          <div class="flex flex-col items-center justify-center text-lg font-bold text-white bg-verdeArk button-cortado-eventos">
+            <span class="font-akira-bold">{evento.fecha}</span>
+            <span class="text-sm font-normal tracking-wider font-akira-bold">{evento.mes}</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="m-0 text-base font-semibold text-verdeArk">{evento.titulo}</h3>
+            <p class="mt-1 mb-3 text-sm text-gray-700">{evento.descripcion}</p>
+            <div class="flex items-center gap-4">
+              <a href={evento.link} class="px-5 py-1 text-[10px] font-medium text-white no-underline items-start button-cortado-sm lg:!p-0 lg:!pr-6 lg:!pl-2 lg:!py-1 font-akira-bold">Inscribirme</a>
+              <span class="text-sm text-verdeArk">{evento.hora}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+) : (
+  <section class="flex flex-col items-start w-full gap-4 px-2 py-8 mx-auto lg:flex-row lg:w-4/5 lg:gap-8">
+    <div class="min-w-[250px] w-full lg:w-auto mb-6 lg:mb-0">
+      <h2 class="mb-2 text-4xl font-medium leading-tight text-moradoArk">Nuestros<br />eventos</h2>
+      <p class="mb-8 lg:text-[13px] text-gray-700">Entérate de todos nuestros seminarios, charlas y eventos que transformarán tu conocimiento.</p>
+    </div>
+    <div class="flex flex-col flex-1 w-full gap-4 lg:gap-8">
+      <p class="py-10 text-center text-gray-500">No hay eventos disponibles en este momento</p>
+    </div>
+  </section>
+)}

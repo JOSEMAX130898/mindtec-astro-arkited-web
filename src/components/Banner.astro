@@ -1,0 +1,74 @@
+---
+import BannerNosotros from "../assets/BannerNosotros.png";
+import rectangle from "../assets/Rectangle.png";
+import { fetchWebInfo } from '../services/api.js';
+
+// Campos a obtener de la API
+const fields = [
+  "historyBannerTitle",
+  "historyBannerTitle2",
+  "historyBannerSubtitle",
+  "historyBannerImage",
+  "historyDescriptionQuill",
+  "historyDescriptionImage",
+  "historyWhatQuill",
+  "historyWhatImage",
+  "historyHowTitle",
+  "historyHow1Text",
+  "historyHow1Quill",
+  "historyHow1Image",
+  "historyHow2Text",
+  "historyHow2Quill",
+  "historyHow2Image",
+  "historyHow3Text",
+  "historyHow3Quill",
+  "historyHow3Image",
+  "historyBenefitsTitle"
+];
+
+
+const webInfoData = await fetchWebInfo("arkited", fields);
+
+
+const webInfo = webInfoData.reduce((acc: any, item: any) => {
+  acc[item.field] = item.info;
+  return acc;
+}, {});
+
+
+const banner = {
+  titulo: webInfo.historyBannerTitle || "Formamos jóvenes",
+  titulo2: webInfo.historyBannerTitle2 || "",
+  subtitulo: webInfo.historyBannerSubtitle || "",
+  link: "/nosotros",
+  imagen: webInfo.historyBannerImage ,
+};
+---
+
+<section class="relative flex flex-col-reverse items-center justify-between w-full overflow-hidden rounded-lg md:flex-row min-h-[400px] md:min-h-[500px]">
+  <img src={rectangle.src} alt="Rectangle" class="absolute inset-0 object-cover w-full h-full -z-10" />
+ 
+  <div class="flex flex-col items-start justify-center flex-1 order-2 gap-1 px-6 py-8 mt-10 lg:gap-3 md:py-16 md:pl-16 md:pr-0 lg:order-1">
+    <div class="flex flex-col justify-start gap-1 px-2 py-2 lg:px-4 lg:py-2 bg-verdeArk w-fit banner-cortado-banner">
+      <h2 class="w-auto py-4 pb-2 pr-3 text-3xl font-semibold text-black lg:pb-3 font-akira lg:text-5xl lg:pr-5">{banner.titulo}</h2>
+      {banner.titulo2 && (
+        <div class="w-full border-b-2 border-black"></div>
+        <p class="py-2 mr-10 text-lg font-semibold text-black lg:text-2xl whitespace-nowrap">{banner.subtitulo}</p>
+      )}
+  
+    </div>
+    <div class="flex flex-col gap-5 w-fit button-cortado-sm">
+      
+    </div>
+     {banner.titulo2 && (
+          <div class="max-w-md w-fit">
+            <p class="text-lg font-normal break-words lg:text-5xl text-verdeArk font-akira">{banner.titulo2}</p>
+          </div>
+        )}
+   
+  </div>
+  <div class="relative flex-1 flex items-center w-full h-full min-h-[260px] md:min-h-[320px] order-1 lg:order-2">
+    <!-- SVG de fondo -->
+    <img src={banner.imagen} alt="Jóvenes Arkited" class="relative z-10 w-auto lg:max-h-[800px] md:max-h-full object-contain" draggable="false" />
+  </div>
+</section>

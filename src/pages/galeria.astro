@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BannerPrincipal from '../components/BannerPrincipal.astro';
+import BannerGaleria from '../assets/BannerGaleria1.png';
+import SeccionGaleria from '../components/sections/Galeria.astro';
+import { getGaleriaInfo } from '../services/api.js';
+
+
+const galeriaData = await getGaleriaInfo();
+
+
+const titulo = galeriaData.galleryTitle || galeriaData.galleryTitle2 || "Galería";
+const subtitulo = galeriaData.gallerySubtitle || "";
+const imagen = galeriaData.galleryImage || BannerGaleria.src;
+const titulo2 = galeriaData.galleryTitle2;
+---
+
+<Layout title="Galería - Arkited">
+    <BannerPrincipal 
+    titulo={titulo}
+    subtitulo={subtitulo}
+    titulo2={titulo2}
+  
+
+    imagen={imagen} 
+  />
+  <SeccionGaleria/>
+</Layout> 

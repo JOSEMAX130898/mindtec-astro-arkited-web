@@ -1,0 +1,207 @@
+---
+import { fetchBlog, fetchWebInfo } from '../services/api.js';
+
+interface BlogPost {
+  _id: string;
+  title?: string;
+  excerpt?: string;
+  author?: string;
+  content?: string;
+  imageUrl?: string;
+  published_at?: string;
+  created_at?: string;
+  category?: string;
+  status?: number;
+  urlName?: string;
+}
+
+interface WebInfo {
+  blogTitle?: string;
+  blogTitle2?: string;
+  blogSubtitle?: string;
+  blogImage?: string;
+}
+
+// Obtener datos del blog y webinfo desde la API
+const blogData: BlogPost[] = await fetchBlog() || [];
+const webInfoData = await fetchWebInfo('arkited', ['blogTitle', 'blogTitle2', 'blogSubtitle', 'blogImage']);
+
+// Debug: Ver qué datos trae la API
+console.log('=== DEBUG BLOG ===');
+console.log('Datos del blog:', blogData);
+console.log('Datos de webinfo:', webInfoData);
+
+// Formatear webinfo
+const webInfo: WebInfo = webInfoData.reduce((acc: WebInfo, item: any) => {
+  (acc as any)[item.field] = item.info;
+  return acc;
+}, {} as WebInfo);
+
+// Mapear los datos del blog a la estructura que necesita el componente
+const blogs = blogData.map(post => ({
+  title: post.title || 'Sin título',
+  date: post.published_at ? new Date(post.published_at).toLocaleDateString('es-ES') : '',
+  image: post.imageUrl || '/temp/slider.png',
+  urlName: post.urlName || '',
+}));
+
+// Para desktop solo mostrar 3 blogs
+const blogsDesktop = blogs.slice(0, 3);
+
+console.log('Blogs mapeados:', blogs);
+console.log('Cantidad de blogs:', blogs.length);
+
+// Verificar si hay blogs antes de renderizar
+const hayBlogs = blogs.length > 0;
+console.log('¿Hay blogs válidos?', hayBlogs);
+console.log('Blogs para móvil (todos):', blogs.length);
+console.log('Blogs para desktop (3):', blogsDesktop.length);
+---
+
+{hayBlogs && (
+  <section
+    class="flex flex-row items-start w-11/12 gap-4 py-12 mx-auto bg-white lg:gap-10 lg:flex-row lg:w-2/3 lg:mx-auto"
+  >
+    <!-- Izquierda -->
+    <div class="flex flex-col items-start w-2/4 gap-4 lg:w-4/12">
+      <h2 class="text-lg font-medium lg:text-4xl text-verdeArk font-akira-bold">Blog</h2>
+      <h2 class="mb-6 text-lg font-normal text-black lg:text-2xl">
+        {webInfo.blogSubtitle || 'Entérate las últimas novedades'}
+      </h2>
+
+   
+
+   <div class="flex">
+    <a
+        href="/blog"
+        class="bg-green-500 hover:bg-[#00B247] text-white px-5 py-2 text-sm inline-block lg:w-2/5 button-cortado font-akira-bold"
+      >
+        Ver todo
+      </a>
+   </div>
+
+      <div class="flex gap-2">
+        <span class="w-2 h-2 bg-verdeArk"></span>
+        <span class="w-2 h-2 bg-[#006B28]"></span>
+        <span class="w-2 h-2 bg-[#262626]"></span>
+      </div>
+    </div>
+
+    <!-- Derecha -->
+    <div class="z-10 flex w-2/4 gap-4 overflow-x-auto lg:w-8/12 no-scrollbar">
+      {/* Carrusel para móvil */}
+      <div class="block w-full lg:hidden">
+        <div id="blog-carousel" class="relative overflow-hidden">
+          <div id="blog-slides" class="flex transition-transform duration-500 ease-in-out">
+            {blogs.map((item, index) => (
+              <div class="flex flex-col justify-end text-white h-[300px] w-full flex-shrink-0 overflow-hidden">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  class="inset-0 object-cover w-full h-full" 
+                />
+                <div class="relative z-10 banner-cortado-blog">
+                  <p class="font-semibold">{item.title}</p>
+                  <p class="mt-1">{item.date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Botones de navegación para móvil */}
+          {blogs.length > 1 && (
+            <>
+              <button id="blog-prev" class="absolute p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full left-2 top-1/2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <button id="blog-next" class="absolute p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full right-2 top-1/2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Grid para desktop */}
+      <div class="hidden w-full grid-cols-1 gap-4 lg:grid lg:grid-cols-3">
+        {blogsDesktop.map((item) => (
+    <a href={`/blog/${item.urlName}`}>
+            <div class="flex flex-col justify-end text-white h-[300px] w-full overflow-hidden">
+            <img 
+              src={item.image} 
+              alt={item.title} 
+              class="inset-0 object-cover w-full h-full" 
+            />
+            <div class="relative z-10 banner-cortado-blog">
+              <p class="font-semibold">{item.title}</p>
+              <p class="mt-1">{item.date}</p>
+            </div>
+          </div>
+    </a>
+        ))}
+      </div>
+    </div>
+
+  </section>
+)}
+{!hayBlogs && (
+  <section class="flex flex-col items-start gap-8 px-4 py-12 bg-white lg:flex-row lg:px-16">
+    <div class="w-full lg:w-4/12">
+      <h2 class="lg:text-4xl text-2xl font-medium text-[#5a0079]">Blog</h2>
+      <h2 class="mb-6 text-2xl font-normal text-black">
+        Entérate las últimas novedades
+      </h2>
+    </div>
+    <div class="w-full lg:w-8/12">
+      <p class="py-10 text-center text-gray-500">No hay posts disponibles en el blog</p>
+    </div>
+  </section>
+)}
+
+<script>
+  function initBlogCarousel() {
+    const slidesEl = document.getElementById("blog-slides");
+    const prevBtn = document.getElementById("blog-prev");
+    const nextBtn = document.getElementById("blog-next");
+    
+    if (slidesEl && prevBtn && nextBtn) {
+      let currentIndex = 0;
+      const totalSlides = slidesEl.children.length;
+      
+      function goToSlide(index: number) {
+        if (index >= 0 && index < totalSlides && slidesEl) {
+          currentIndex = index;
+          slidesEl.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+      }
+      
+      function nextSlide() {
+        const nextIndex = (currentIndex + 1) % totalSlides;
+        goToSlide(nextIndex);
+      }
+      
+      function prevSlide() {
+        const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        goToSlide(prevIndex);
+      }
+      
+      // Event listeners
+      nextBtn.addEventListener("click", nextSlide);
+      prevBtn.addEventListener("click", prevSlide);
+      
+      // Auto-avance
+      setInterval(nextSlide, 5000);
+    }
+  }
+  
+  // Ejecutar cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBlogCarousel);
+  } else {
+    initBlogCarousel();
+  }
+</script>

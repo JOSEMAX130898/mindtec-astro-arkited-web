@@ -1,0 +1,72 @@
+---
+const slides = [
+  {
+    title: "Diseña tu futuro",
+    date: "Inicio 20 y 23 de diciembre",
+    image: "/temp/slider.png"
+  },
+  {
+    title: "Diseña tu futuro",
+    date: "Inicio 15 de enero",
+    image: "/temp/slider.png"
+  },
+  {
+    title: "Diseña tu futuro",
+    date: "Inicio 5 de marzo",
+    image: "/temp/slider.png"
+  }
+];
+---
+<div class="relative overflow-hidden">
+  <!-- Slides wrapper -->
+  <div class="relative w-full">
+    <div id="slides" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%)">
+
+        <div class="w-full min-w-full flex-shrink-0 flex items-center justify-between bg-[#ffffff] relative">
+          <!-- Fondo SVG -->
+          <svg class="absolute -z-10 top-0 left-0 w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#00c853" fill-opacity="0.25" d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,58.7C672,43,768,53,864,64C960,75,1056,85,1152,117.3C1248,149,1344,203,1392,229.3L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z" />
+          </svg>
+
+          <!-- Contenido -->
+          
+          
+          <div class="relative z-10 w-full lg:w-6/12 flex justify-center items-center overflow-visible">
+
+            <svg class="absolute w-full h-full opacity-100 -z-10" viewBox="0 0 582 546" fill="none" xmlns="http://www.w3.org/2000/svg"  preserveAspectRatio="none">
+            <mask id="mask0_201_14" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="582" height="546">
+            <path d="M582 0H0V545.05H582V0Z" fill="white"/>
+            </mask>
+            <g mask="url(#mask0_201_14)">
+            <path d="M-422.78 722.483C-411.34 688.248 -230.07 350.49 198.52 512.678C256.79 538.73 316.78 556.233 378.14 540.659C500.65 509.542 592.51 389.742 579.89 268.118C563.45 109.732 445 -25.8348 322.47 5.3407C249.8 23.799 215.06 66.1961 139.55 190.599C139.55 190.599 -16.7701 493.573 -566.45 310.997C-643.9 284.685 -712.14 270.559 -792.72 281.443C-968.91 305.256 -1130.29 532.082 -1081.85 744.53C-1041.6 921.104 -870.37 1095.62 -698.29 1051.91C-586.84 1023.63 -484.39 879.045 -422.78 722.483Z" fill="#00B247"/>
+            </g>
+            </svg>
+
+            <!-- Imagen principal -->
+            <img src={"../temp/propuesta_valor.png"} alt="Estudiantes" class="max-h-[400px] w-auto relative" />
+          </div>
+          <div class="z-10 w-full lg:w-6/12 lg:pl-8 pl-4 lg:pr-20">
+            <h2 class="lg:text-4xl text-2xl font-medium text-[#5a0079]">Propuesta Valor</h2>
+            <!-- <div class="h-1 w-12 bg-green-600 my-4"></div> -->
+             <div class="h-1 w-12 my-2"></div> 
+            <p class="text-[#000000] font-medium mb-4">
+                Somos un taller con más de 10 años de experien-
+                cia transformando el conocimiento de los futuros 
+                arquitectos del Perú.
+            </p>
+             <p class="text-[#000000] font-medium mb-4">
+                Potenciamos las habilidades de nuestros postu-
+                lantes mediante técnicas y herramientas que, año 
+                tras año, hemos venido aplicando con éxito.
+            </p>
+             <p class="text-[#000000] font-medium mb-4">
+                Estamos convencidos de que hoy transformarás 
+                tu conocimiento para que mañana transformes tu 
+                futuro.
+            </p>
+          </div>
+        </div>
+    </div>
+  </div>
+
+</div>

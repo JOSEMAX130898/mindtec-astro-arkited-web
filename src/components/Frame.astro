@@ -1,0 +1,199 @@
+---
+import { getLetrasInfo } from "../services/api";
+
+const letrasData = await getLetrasInfo();
+
+
+
+
+// Interfaz para definir las secciones
+interface Section {
+  letter: string;
+  title: string;
+  description: string;
+  letterColor: string;
+  imageSrc?: string; // Propiedad opcional para la ruta de la imagen
+}
+
+// Props del componente
+interface Props {
+  sections?: Section[];
+}
+
+// Datos por defecto basados en la imagen
+const defaultSections: Section[] = [
+  {
+    letter: "A",
+    title: letrasData.historyHowAText || "PRUEBA DE APTITUD VOCACIONAL",
+    description: letrasData.historyHowAQuill || "Es una prueba exclusiva para todos los que postulan a la carrera de arquitectura de la Universidad Nacional de Ingeniería. Esta prueba busca comprobar las capacidades del futuro arquitecto, por ello es necesario estar preparado.",
+    letterColor: "text-green-400",
+    imageSrc: "/A.png" 
+  },
+  {
+    letter: "B", 
+    title: letrasData.historyHowBText || "PRUEBA DE APTITUD VOCACIONAL",
+    description: letrasData.historyHowBQuill || "Es una prueba exclusiva para todos los que postulan a la carrera de arquitectura de la Universidad Nacional de Ingeniería. Esta prueba busca comprobar las capacidades del futuro arquitecto, por ello es necesario estar preparado.",
+     letterColor: "text-green-600",
+    imageSrc: "/B.png" 
+  },
+  {
+    letter: "C",
+    title: letrasData.historyHowCText || "PRUEBA DE APTITUD VOCACIONAL",
+    description: letrasData.historyHowCQuill || "Es una prueba exclusiva para todos los que postulan a la carrera de arquitectura de la Universidad Nacional de Ingeniería. Esta prueba busca comprobar las capacidades del futuro arquitecto, por ello es necesario estar preparado.",
+    letterColor: "text-black",
+    imageSrc: "/c.png"
+  }
+];
+
+// Obtener las secciones de las props o usar las por defecto
+const { sections = defaultSections } = Astro.props;
+---
+
+<script>
+  // Script para el carrusel móvil
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('mobile-carousel');
+    const slides = carousel?.querySelectorAll('.carousel-slide');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    let currentSlide = 0;
+    const totalSlides = slides?.length || 0;
+
+    function showSlide(index: number) {
+      if (!slides) return;
+      
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('hidden', i !== index);
+      });
+      
+      indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('bg-green-600', i === index);
+        indicator.classList.toggle('bg-gray-300', i !== index);
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    // Event listeners
+    nextBtn?.addEventListener('click', nextSlide);
+    prevBtn?.addEventListener('click', prevSlide);
+
+    // Auto-play (opcional)
+    setInterval(nextSlide, 5000);
+
+    // Inicializar
+    showSlide(0);
+  });
+</script>
+
+<div class="relative flex py-16 bg-white">
+  <div class="max-w-6xl px-4 mx-auto">
+    
+    {/* Carrusel para móvil - Solo visible en pantallas pequeñas */}
+    <div id="mobile-carousel" class="block md:hidden">
+      <div class="relative">
+        {sections.map((section, index) => (
+          <div class={`carousel-slide space-y-4 ${index === 0 ? '' : 'hidden'}`}>
+            {/* Letra grande o imagen */}
+            {section.imageSrc ? (
+              <div class="flex mb-4">
+                <img 
+                  src={section.imageSrc} 
+                  alt={section.letter}
+                  class="object-contain w-24 h-24"
+                />
+              </div>
+            ) : (
+              <div class={`text-6xl font-archivo font-bold ${section.letterColor} mb-4`}>
+                {section.letter}
+              </div>
+            )}
+            
+            {/* Título */}
+            <h3 class="mb-4 text-lg tracking-wide text-green-600 uppercase font-akira-bold">
+              {section.title}
+            </h3>
+            
+            {/* Descripción */}
+            <p class="px-4 text-sm leading-relaxed text-gray-700 font-archivo-regular">
+              {section.description}
+            </p>
+          </div>
+        ))}
+        
+        {/* Botones de navegación */}
+        <button 
+          id="prev-btn" 
+          class="absolute left-0 p-2 transition-colors transform -translate-y-1/2 rounded-full top-1/2 "
+          aria-label="Slide anterior"
+        >
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        
+        <button 
+          id="next-btn" 
+          class="absolute right-0 p-2 transition-colors transform -translate-y-1/2 rounded-full top-1/2 "
+          aria-label="Siguiente slide"
+        >
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+      
+      {/* Indicadores */}
+      <div class="flex justify-center mt-6 space-x-2">
+        {sections.map((_, index) => (
+          <button 
+            class={`carousel-indicator w-3 h-3 rounded-full transition-colors ${index === 0 ? 'bg-green-600' : 'bg-gray-300'}`}
+            aria-label={`Ir al slide ${index + 1}`}
+          ></button>
+        ))}
+      </div>
+    </div>
+
+    {/* Grid para desktop - Solo visible en pantallas medianas y grandes */}
+    <div class="hidden grid-cols-1 gap-8 md:grid md:grid-cols-3">
+      {sections.map((section, index) => (
+        <div class="">
+          {/* Letra grande o imagen */}
+          {section.imageSrc ? (
+            <div class="flex justify-center mb-4">
+              <img 
+                src={section.imageSrc} 
+                alt={section.letter}
+                class="object-contain lg:w-32 lg:h-32"
+              />
+            </div>
+          ) : (
+            <div class={`text-8xl font-archivo font-bold ${section.letterColor} mb-4`}>
+              {section.letter}
+            </div>
+          )}
+          
+          {/* Título */}
+          <h3 class="text-xl tracking-wide text-green-600 uppercase font-akira-bold lg:h-[50px]">
+            {section.title}
+          </h3>
+          
+          {/* Descripción */}
+          <p class="text-sm leading-relaxed text-gray-700 font-archivo-regular">
+            {section.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

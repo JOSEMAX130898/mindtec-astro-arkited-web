@@ -1,0 +1,72 @@
+---
+import { fetchWebInfo } from '../services/api.js';
+
+// Campos a obtener de la API
+const fields = [
+  "reasonTitle",
+  "reasonTitle2", 
+  "reasonText",
+  "reasonButton",
+  "reasonLink",
+  "reasonImage"
+];
+
+// Obtener datos de la API
+const webInfoData = await fetchWebInfo("arkited", fields);
+
+console.log('=== DEBUG PROPUESTA VALOR ===');
+console.log('Datos de la API:', webInfoData);
+
+// Formatear los datos
+const propuestaData = webInfoData.reduce((acc: Record<string, string>, item: { field: string; info: string }) => {
+  acc[item.field] = item.info;
+  return acc;
+}, {});
+
+console.log('Datos formateados:', propuestaData);
+
+// Solo mostrar si hay datos
+const hayDatos = Object.keys(propuestaData).length > 0;
+console.log('¿Hay datos disponibles?', hayDatos);
+---
+
+{hayDatos ? (
+  <div class="relative overflow-hidden">
+    <!-- Slides wrapper -->
+    <div class="relative w-full">
+      <div id="slides" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%)">
+
+          <div class="w-full min-w-full flex-shrink-0 flex flex-col lg:flex-row items-center justify-between bg-[#ffffff] relative py-8 lg:py-0">
+            <!-- Fondo SVG -->
+            <div class="relative flex items-center justify-center order-2 w-full lg:w-6/12 lg:order-1">
+              <svg class="absolute w-[110%] h-[110%] max-w-none max-h-none left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" viewBox="0 0 599 613" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0,613 Q299.5,0 599,613 Z" fill="#00B247" />
+              </svg>
+              <!-- Imagen principal -->
+              <img src={propuestaData.reasonImage} alt="Estudiante propuesta valor" class="max-h-[350px] w-auto relative z-10 drop-shadow-xl object-contain lg:max-h-[500px]" />
+            </div>
+            <div class="z-10 order-1 px-10 mt-6 lg:mt-0 lg:w-6/12 lg:pl-8 lg:pr-20 lg:order-2">
+           <div class="lg:w-4/5">
+            <h2 class="mb-5 text-2xl font-bold lg:text-4xl text-blackArk font-akira">{propuestaData.reasonTitle}</h2>
+            <p class="text-[#000000] font-light mb-4">
+              {propuestaData.reasonTitle2}
+          </p>
+          <p class="text-[#000000] font-light mb-4">
+              {propuestaData.reasonText}
+          </p>
+          {propuestaData.reasonButton && propuestaData.reasonLink && (
+            <a href={propuestaData.reasonLink} class="inline-block px-6 py-3 text-white bg-[#5a0079] rounded-lg hover:bg-[#4a0066] transition-colors duration-300 font-medium">
+              {propuestaData.reasonButton}
+            </a>
+          )}
+           </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+) : (
+  <div class="px-4 py-10 text-center lg:px-0">
+    <p class="text-gray-500">No hay datos disponibles para la propuesta de valor</p>
+  </div>
+)}

@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BannerPrincipal from '../components/BannerPrincipal.astro';
+import ContactanosImg from '../assets/BannerContactanos.png';
+import FormContactanos from '../components/sections/FormContactanos.astro';
+import { getContactoInfo }  from '../services/api.js'
+
+const contactoData = await getContactoInfo();
+
+const titulo = contactoData.contactTitle || contactoData.contactTitle2 || "Galería";
+const subtitulo = contactoData.contactSubtitle || "";
+const imagen = contactoData.contactImage || ""; 
+const titulo2 = contactoData.contactTitle2 || "";
+---
+<Layout title="Contáctanos - Arkited">
+    <BannerPrincipal titulo={titulo} subtitulo={subtitulo} titulo2={titulo2} imagen={imagen} />
+    <FormContactanos />
+</Layout>

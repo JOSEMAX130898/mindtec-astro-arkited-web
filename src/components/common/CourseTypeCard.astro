@@ -1,0 +1,19 @@
+---
+const { tipo, nombre } = Astro.props;
+
+
+let imageUrl = tipo;
+if (typeof tipo === 'object' && tipo !== null) {
+
+  imageUrl = tipo.url || tipo.src || tipo.image || tipo.path || '';
+}
+---
+<div class="flex flex-col items-center gap-3">
+  <img src={imageUrl} alt={nombre} class="object-contain w-24 h-24" />
+  <div class="text-lg lg:text-3xl text-moradoArk font-bebas ">{nombre}</div>
+ <div class="flex items-start w-full ml-5 lg:ml-0">
+<a href={`/ciclos/${nombre}`}>  <button class="w-2/3 lg:w-full lg:items-center lg:px-5 lg:py-1 pl-3
+  mt-1 text-[10px] lg:text-xl items-start !text-verdeArk !bg-moradoArk button-cortado-xs">Ver todo</button></a>
+
+ </div>
+</div> 

@@ -1,0 +1,42 @@
+---
+import Rectangle from '../../assets/Rectangle.png';
+import Enseñamos from '../../../public/ensenamos.png';
+import { getEnsenamos } from '../../services/api';
+
+const ensenamosData = await getEnsenamos();
+
+const contenido = {
+  titulo: "¿QUE ENSENAMOS?",
+  parrafos: ensenamosData.historyWhatQuill || "",
+  img : ensenamosData.historyWhatImage,
+};
+---
+
+<section class="relative flex flex-col-reverse items-center justify-between w-full overflow-hidden min-h-[400px] md:min-h-[500px] md:flex-row">
+  <img 
+    src={Rectangle.src} 
+    alt="Fondo Enseñamos" 
+    class="absolute inset-0 object-cover w-full h-full -z-10" 
+    draggable="false" 
+  />
+  
+  <div class="relative z-10 flex flex-col items-start justify-center flex-1 px-6 py-8 md:py-16 md:pl-16 md:pr-0">
+    <h2 class="mb-4 text-2xl font-normal text-verdeArk md:text-3xl lg:text-4xl font-akira-bold">
+      {contenido.titulo}
+    </h2>
+  
+      <p class="mb-3 text-sm text-white md:text-base lg:text-lg">
+        {contenido.parrafos}
+      </p>
+ 
+  </div>
+  
+  <div class="relative flex-1 flex items-center w-full h-full min-h-[260px] md:min-h-[320px]">
+    <img 
+      src={contenido.img} 
+      alt="Contenido Enseñamos" 
+      class="relative z-10 w-auto max-h-[320px] md:max-h-full object-contain mx-auto" 
+      draggable="false" 
+    />
+  </div>
+</section>

@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SedesComponent from '../components/sections/Sedes.astro';
+import BannerPrincipal from '../components/BannerPrincipal.astro';
+import { getSedesInfo } from '../services/api.js';
+import BannerSedes from '../assets/BannerNosotros.png';
+
+const sedesData = await getSedesInfo();
+
+const titulo = sedesData.locationsTitle || sedesData.locationsTitle2 || "Sedes";
+const subtitulo = sedesData.locationsSubtitle || "";
+const imagen = sedesData.locationsImage || BannerSedes.src;
+const titulo2 = sedesData.locationsTitle2 || "";
+---
+
+<Layout title="Sedes - Arkited">
+    <BannerPrincipal 
+      titulo={titulo}
+      subtitulo={subtitulo}
+      titulo2={titulo2}
+      imagen={imagen} 
+    />
+ <SedesComponent/>
+</Layout>   

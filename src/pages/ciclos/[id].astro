@@ -1,0 +1,1201 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { fetchCycleDetails, fetchCycles, fetchAdvices, fetchWebInfo } from '../../services/api.js';
+import Vectorciclos from '../../assets/BannerCiclos.png';
+import BannerPrincipal from '../../components/BannerPrincipal.astro';
+import Modal from '../../components/common/Modal.astro';
+import ImgPlan from '../../../public/img/plan.png'
+import ImgHorario from '../../../public/img/horario.png'
+import whatsappIcon from '../../assets/WHATSAPP2.svg';
+import phoneIcon from '../../assets/TELEFONO2.svg';
+import beneficios from '../../assets/servicios2.png';
+import rectangle from '../../assets/Rectangle.png';
+import { getFooterInfo } from '../../services/api';
+import ImgPlandeestudios from '../../assets/plandeestudios.png';
+
+import calendarIcon from "../../assets/FECHA.svg";
+import clockIcon from "../../assets/HORA.svg";
+import matriculaIcon from "../../assets/MENSUALIDAD.svg";
+import ubicacionIcon from "../../assets/UBICACION.svg";
+import checkIcon from "../../assets/CHECK.svg";
+import noCheckIcon from "../../assets/NO_CHECK.svg";
+import fecha2 from "../../assets/fecha2.svg";
+import relojArena from "../../assets/reloj_arena.svg";
+
+const extractTurns = (sections: any[]) => {
+  if (sections && sections.length > 0) {
+    return sections.map((section: any) => section.turns || []);
+  }
+  return [];
+};
+
+
+const extractForms = (sections: any[]) => {
+  if (sections && sections.length > 0) {
+    return sections.flatMap((section: any) => section.form || []);
+  }
+  return [];
+};
+
+const extractBeneficios = (sections: any[]) => {
+  if (sections && sections.length > 0) {
+    return sections.flatMap((section: any) => section.requeriments || []);
+  }
+  return [];
+};
+
+const extractServicios = (sections: any[]) => {
+  if (sections && sections.length > 0) {
+    return sections.flatMap((section: any) => section.extra_info || []);
+  }
+  return [];
+};
+
+const extractSchedules = (sections: any[]) => {
+  if (!sections || sections.length === 0) return [];
+  return sections.map((section: any) => section.form?.schedules || []);
+};
+
+export async function getStaticPaths() {
+  try {
+    const cycles = await fetchCycles();
+    
+    if (!cycles || !Array.isArray(cycles)) {
+      console.warn('No se pudieron obtener los ciclos para generar rutas');
+      return [];
+    }
+
+    return cycles.map((cycle) => ({
+      params: { id: cycle.name },
+      props: { cycle }
+    }));
+  } catch (error) {
+    console.error('Error al generar rutas estáticas para ciclos:', error);
+    return [];
+  }
+}
+
+const { id } = Astro.params;
+const { cycle } = Astro.props;
+
+let data = null;
+let turnos = [];
+let form = [];
+let requeriments = [];
+let servicios = [];
+let schedules = [];
+let sedes = [];
+let diasSeleccionados = [];
+let testimonios = [];
+let contactInfo: any = {};
+
+// Obtener datos de la API
+try {
+  const response = await fetch(`https://edtlab-cms-dev.herokuapp.com/api/admin/cycle_name/${id}`);
+  
+  if (response.ok) {
+    const jsonData = await response.json();
+    
+   
+    const activeSections = jsonData.sections.filter((section: any) => section.activo !== false);
+    
+   
+    turnos = extractTurns(activeSections);
+    form = extractForms(activeSections);
+    schedules = extractSchedules(activeSections);
+    requeriments = extractBeneficios(activeSections);
+    servicios = extractServicios(activeSections);
+    
+    
+    // Extraer sedes y días seleccionados
+    if (activeSections && activeSections.length > 0) {
+      sedes = JSON.parse(activeSections[0].sedes || "[]");
+      if (turnos.length > 0) {
+        diasSeleccionados = JSON.parse(turnos[0].diasSeleccionados || "[]");
+      }
+    }
+    
+    // Actualizar data con secciones filtradas
+    data = { ...jsonData, sections: activeSections };
+  }
+} catch (error) {
+  console.error('Error al obtener datos del ciclo:', error);
+}
+
+// Obtener datos del footer
+const footerData = await getFooterInfo();
+
+// Obtener testimonios
+try {
+  testimonios = await fetchAdvices();
+} catch (error) {
+  console.error('Error al obtener testimonios:', error);
+}
+
+// Obtener información de contacto
+try {
+  const contactResponse = await fetchWebInfo("arkited", [
+    "contactPhone",
+    "contactPhoneLink"
+  ]);
+  
+  if (contactResponse) {
+    contactInfo = contactResponse.reduce((acc: any, item: any) => {
+      acc[item.field] = item.info;
+      return acc;
+    }, {});
+  }
+} catch (error) {
+  console.error('Error al obtener información de contacto:', error);
+}
+
+if (!data) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={`${data.name} - Arkited`}>
+
+  <section class="w-full min-h-screen bg-white">
+    <BannerPrincipal titulo={data.title} titulo2={data.title2} subtitulo={data.subtitle} imagen={data.imageUrl} />
+    <!-- Banner principal con imagen -->
+    <!-- <div class="relative w-full h-screen overflow-hidden bg-green-50">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <img 
+          src={data.imageUrl} 
+          alt="Imagen principal" 
+          class="object-cover" 
+          draggable="false" 
+        />
+      </div>
+      
+      <div class="relative z-10 flex items-center w-full h-full">
+        <div class="flex items-center w-full h-full px-6 lg:px-20 xl:px-28">
+       
+          <div class="relative z-20 flex items-center h-full min-w-0">
+            <div class="max-w-md lg:max-w-lg">
+              <h2 class="text-3xl font-normal leading-tight text-white sm:text-4xl lg:text-5xl xl:text-6xl text-shadow-lg">
+                {data.title} <br /> {data.title2}
+              </h2>
+            </div>
+          </div>
+          
+       
+        
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Sistema de pestañas -->
+    <div class="flex flex-col justify-center mx-auto lg:py-4 lg:w-[90%] ">
+      <div class="text-center">
+        <ul class="flex justify-center w-full">
+          {data.sections && data.sections.map((section: any, index: number) => (
+            <li class={index < data.sections.length - 1 ? "mr-2" : ""}>
+              <button
+                class={`inline-block p-4 lg:text-3xl rounded-t-lg ${index === 0 ? "border-b-2 border-moradoArk text-moradoArk" : "text-gray-500"}`}
+                data-tab={index + 1}
+              >
+                {section.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="bg-white py-14">
+        <!-- Contenido de las pestañas -->
+        {data.sections && data.sections.map((section: any, sectionIndex: number) => (
+          <div class={sectionIndex === 0 ? "" : "hidden"} data-tab-content={sectionIndex + 1}>
+            <!-- Layout de 2 columnas -->
+            <div class="flex flex-col w-11/12 m-auto lg:w-full lg:flex-row lg:gap-12">
+              
+              <!-- Columna izquierda - Contenido informativo -->
+              <div class="space-y-4 lg:w-1/2">
+                <h2 class="text-3xl font-bold text-moradoArk font-akira">{section.description?.title}</h2>
+                <!-- Sección Descripción con icono -->
+                <div class="flex items-start ">
+                  {/* <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full bg-verdeArk">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div> */}
+                  <div class="flex-1">
+                    {/* <h3 class="mb-3 text-xl font-bold text-verdeArk">Descripción</h3> */}
+                    <div class="space-y-3 text-gray-700">
+                      <div set:html={section.description?.text || ""} ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Información de fechas de clases -->
+                <div class="flex justify-start w-full my-8">
+                  <div class="flex items-start justify-start w-full max-w-4xl gap-10">
+                    <!-- Inicio de clases -->
+                    <div class="flex flex-col items-start justify-start pr-5 text-left border-r-2 border-gray-200">
+                     <div class="flex flex-row items-center justify-start space-x-1">
+                      <div class="flex items-center justify-start gap-1 rounded-lg">
+                        <img src={fecha2.src} alt="fecha" class="w-5 h-5" />
+                      
+                        <p class="text-lg text-verdeArk">Inicio</p>
+                      </div>
+       
+                     </div>
+                      <p class="text-lg text-verdeArk">{section.description?.inicio_clases || 'Por definir'}</p>
+                    </div>
+
+                    <!-- Fin de clases -->
+                    <div class="flex flex-col items-start justify-start pr-5 text-left border-r-2 border-gray-200">
+                      <div class="flex flex-row items-center justify-start space-x-1">
+                        <div class="flex items-center justify-start rounded-lg">
+                          <img src={fecha2.src} alt="fecha" class="w-5 h-5" />
+                        </div>
+                        <p class="text-lg text-verdeArk">Fin</p>
+                      </div>
+                      <p class="text-lg text-verdeArk">{section.description?.fin_clases || 'Por definir'}</p>
+                    </div>
+
+                    <!-- Duración -->
+                    <div class="flex flex-col items-start justify-start pr-5 text-left">
+                      <div class="flex flex-row items-center justify-start space-x-1">
+                        <div class="flex items-center justify-start rounded-lg">
+                          <img src={relojArena.src} alt="duracion" class="w-5 h-5" />
+                        </div>
+                        <p class="text-lg text-verdeArk">Duración</p>
+                      </div>
+                      <p class="text-lg text-verdeArk">{section.description?.duracion_clases || 'Por definir'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección Modalidades -->
+                <div class="flex items-start space-x-4 lg:!mt-14">
+                  {/* <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full bg-verdeArk">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                    </svg>
+                  </div> */}
+                  <div class="flex-1">
+                    {/* <h3 class="mb-3 text-xl font-bold text-verdeArk">Modalidades</h3> */}
+                    <div class="">
+                          {(() => {
+                            // Obtener solo los turnos de la sección actual
+                            const currentSectionTurns = section.turns || [];
+
+                            return currentSectionTurns.length > 0 ? (
+                            <div class="grid grid-cols-1 gap-2">
+                                <!-- Tabs de todos los Turns -->
+                                <div class="">
+                                  <div class="text-center">
+                                    <ul class="flex w-full border-b-2 border-black">
+                                      {currentSectionTurns.map((turn: any, turnIndex: number) => (
+                                        <li class={turnIndex < currentSectionTurns.length - 1 ? "mr-2" : ""}>
+                                          <button
+                                            class={`px-8 py-4 font-bold text-lg ${turnIndex === 0 ? "bg-black text-white" : "bg-[#cbffdc] text-black"}`}
+                                            data-turn-tab={turnIndex + 1}
+                                            onclick={`showTurnTab(${turnIndex + 1})`}
+                                          >
+                                            {turn.nombreturno || turn.name}
+                                          </button>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                                
+                                {currentSectionTurns.map((turn: any, turnIndex: number) => (
+                                  <div class={`lg:p-6 p-2 bg-[#cbffdc] banner-cortado-ciclo ${turnIndex === 0 ? "" : "hidden"}`} data-turn-content={turnIndex + 1} data-turn-enroll={turn.enroll}>
+                                  <!-- Grid de información -->
+                                    <div class="grid grid-cols-3 gap-x-8">
+                                      <!-- Columna 1: Desarrollo -->
+                                      <div class="pr-6 border-r-2 border-gray-400">
+                                        <h2 class="text-xl font-bold text-black">Desarrollo</h2>
+                                        
+                                        <!-- Días de Clases -->
+                                        <div class="flex ml-4">
+                                          <div class="flex items-center justify-center w-6 h-6">
+                                            <img src={calendarIcon.src} alt="calendar" class="w-4 h-4" />
+                                      
+                                    </div>
+                                          <div>
+                                            <p class="font-bold text-verdeEvento">Días de Clase</p>
+                                            <p class="text-black">{JSON.parse(turn.diasSeleccionados || '[]').join(' y ')}</p>
+                                    </div>
+                                    </div>
+                                    
+                                        <!-- Horario de Clases -->
+                                        <div class="flex ml-4">
+                                          <div class="flex items-center justify-center w-6 h-6">
+                                            <img src={clockIcon.src} alt="clock" class="w-4 h-4" />
+                                       
+                                          </div>
+                                          <div>
+                                            <p class="font-bold text-verdeEvento">Horario de Clases</p>
+                                            <p class="text-black">{turn.horaInicioClases} - {turn.horaFinClases}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      <!-- Columna 2: Inversión -->
+                                      <div class="pr-6 border-r-2 border-gray-400">
+                                        <h2 class="text-xl font-bold text-black">Inversión</h2>
+                                        
+                                        <!-- Matrícula -->
+                                        <div class="flex ml-4">
+                                          <div class="flex items-center justify-center w-6 h-6">
+                                            <img src={matriculaIcon.src} alt="matricula" class="w-4 h-4" />
+                                        
+                                    </div>
+                                          <div>
+                                            <p class="font-bold text-verdeEvento">Matrícula</p>
+                                            <p class="text-black">{turn.enroll}</p>
+                                    </div>
+                                        </div>
+                                        
+                                        <!-- Mensualidad -->
+                                        <div class="flex ml-4">
+                                          <div class="flex items-center justify-center w-6 h-6">
+                                            <img src={matriculaIcon.src} alt="matricula" class="w-4 h-4" />
+                                           
+                                          </div>
+                                          <div>
+                                      <p class="font-bold text-verdeEvento">Mensualidad</p>
+                                            <p class="text-black">{turn.onsitePayment}</p>
+                                    </div>
+                                        </div>
+                                      </div>
+                                      
+                                      <!-- Columna 3: Sedes disponibles -->
+                                      <div class="">
+                                        <h2 class="text-xl font-bold text-black">Sedes disponibles</h2>
+                                        
+                                        <!-- Sedes disponibles -->
+                                        <div class="flex ">
+                                    
+                                          
+                                          <div id="sedes-disponibles-${turn.sectionIndex}-${turn.turnIndex}" class="ml-5 space-y-2">
+                                            {(() => {
+                                              try {
+                                                const sedes = JSON.parse(turn.sedes || '[]');
+                                                return sedes.map((sede: any, sedeIndex: number) => {
+                                                  const isAvailable = sede.vacancyName?.toLowerCase().includes('disponible') || 
+                                                                    sede.vacancyName?.toLowerCase().includes('available');
+                                                  
+                                                  return (
+                                                    <div class="flex mb-2 space-x-3">
+                                                      <img src={ubicacionIcon.src} alt="ubicacion" class="w-4 h-4 mt-1" />
+                                                      <div class="flex flex-col">
+                                                        <p class="font-bold text-verdeEvento">{sede.campus_name}</p>
+                                                        <div class="flex items-center space-x-1">
+                                                          {isAvailable ? (
+                                                            <>
+                                                              <span class="text-sm text-black">Vacantes disponibles</span>
+                                                              <img src={checkIcon.src} alt="check" class="w-4 h-4 " />
+                                                            </>
+                                                          ) : (
+                                                            <>
+                                                              <span class="text-sm text-[#d20f27]">Vacantes agotadas</span>
+                                                              <img src={noCheckIcon.src} alt="noCheck" class="w-4 h-4" />
+                                                            </>
+                                                          )}
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  );
+                                                });
+                                              } catch (e) {
+                                                return <p class="text-black">No disponible</p>;
+                                              }
+                                            })()}
+                                          </div>
+                                        </div>
+                                        
+                                  
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p class="text-gray-600">No hay turnos disponibles para este bloque.</p>
+                            );
+                          })()}
+                        </div>
+                  </div>
+                </div>
+
+                <!-- Botón para ver imagen del turno -->
+                <div class="flex justify-center w-full my-8">
+                  <div class="w-full max-w-2xl">
+                    {(() => {
+                      const currentSectionTurns = section.turns || [];
+                      if (currentSectionTurns.length > 0) {
+                        const firstTurn = currentSectionTurns[0];
+                        return (
+                          <div class="flex justify-center py-10">
+                            <button 
+                              onclick={firstTurn.photoUrl ? `window.openImageModal('${firstTurn.photoUrl}', '${firstTurn.nombreturno || firstTurn.name || 'Imagen del turno'}')` : ''}
+                              class={`flex items-center gap-3 px-8 py-4 text-white transition-all duration-300 ${!firstTurn.photoUrl ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+                              disabled={!firstTurn.photoUrl}
+                            >
+                              <img src={ImgPlandeestudios.src} alt="Imagen del turno" class="w-full h-full" />
+
+                            </button>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                </div>
+            
+              </div>
+
+              <!-- Columna derecha - Video y Formulario -->
+              <div class="space-y-2 lg:w-1/2">
+                <!-- Video promocional -->
+                {section.description?.video_promocional && (
+                  <div class="flex">
+                    <div
+                      class="w-full lg:w-[81%]"
+                      set:html={`<iframe class="w-full h-48 sm:h-64 md:h-80 lg:h-64" src="${section.description.video_promocional}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`}
+                    />
+                  </div>
+                )}
+
+                <!-- Formulario de inscripción -->
+                <div class="relative flex items-start justify-center w-full max-w-2xl px-4 aspect-square">
+             <form id="inscriptionForm" class="mt-10 relative z-10 flex flex-col w-full max-w-md gap-2 px-6 py-10 !bg-verdeArk button-cortado-form" autocomplete="off">
+                    <h2 class="mb-1 text-3xl font-bold text-center ">{section.form?.title || '¡INSCRÍBETE AHORA!'}</h2>
+                    <p class="mb-2 text-center opacity-90">
+                      {section.form?.text || 'Para ayudarte a realizar este proceso rápidamente ingresa los siguientes datos'}
+                    </p>
+                    
+                
+                    
+             
+                 
+
+                    {schedules.length > 0 && schedules[sectionIndex] && schedules[sectionIndex].length > 0 && (
+                      <select name="turno" class="px-6 py-2 text-black border-2 border-moradoArk bg-verdeArk focus:outline-none button-cortado-input">
+                        <option value="" class="text-black">Selecciona un turno</option>
+                        {schedules[sectionIndex].map((schedule: any) => (
+                          <option value={schedule.name} class="text-black">
+                            {schedule.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                        <p id="costo-matricula-${sectionIndex} text-center" class="text-4xl font-bold text-center text-white">
+                      Costo: <span id="costo-turno-${sectionIndex}">
+                        {(() => {
+                          // Obtener el primer turno de la sección como valor por defecto
+                          if (section.turns && section.turns.length > 0) {
+                            return section.turns[0].enroll || 'Por definir';
+                          }
+                          return section.form?.cost || 'Por definir';
+                        })()}
+                      </span>
+                    </p>
+                     <div class="flex items-center justify-center gap-2">
+                       <a href={`https://wa.me/${section.form?.phone || ""}`} target="_blank" rel="noopener noreferrer">
+                         <img src={whatsappIcon.src} alt="WhatsApp" class="w-16 h-16" />
+                       </a>
+        
+                       <a href={`tel:${section.form?.phone || ""}`}>
+                         <img src={phoneIcon.src} alt="Phone" class="w-16 h-16" />
+                       </a>
+                     </div>
+                    
+            <a href="https://intranet.edtlab.edu.pe/signup
+            " class="py-2 mt-2 font-medium !text-white transition-colors text-center !bg-moradoArk button-cortado-input">
+                      <p
+                     
+                      class=""
+                    >
+                      {section.form?.button || 'Matriculate en linea'}
+                    </p>
+            </a>
+                  </form>
+                </div>
+
+       
+                <!-- Imagen del turno -->
+                {/* {turnos.length > 0 && turnos[sectionIndex] && turnos[sectionIndex].photoUrl && (
+                  <div class="flex justify-center">
+                    <div class="w-full max-w-lg">
+                      <img 
+                        src={turnos[sectionIndex].photoUrl} 
+                        alt={turnos[sectionIndex].name} 
+                        class="w-full h-auto rounded-lg shadow-lg"
+                      />
+                    </div>
+                  </div>
+                )} */}
+
+                <!-- Imagen de horario/cronograma -->
+                {/* {section.description?.schedule_image && (
+                  <div class="flex justify-center">
+                    <div class="w-full max-w-lg">
+                      <img 
+                        src={section.description.schedule_image} 
+                        alt="Horario del programa" 
+                        class="w-full h-auto rounded-lg shadow-lg"
+                      />
+                    </div>
+                  </div>
+                )} */}
+              </div>
+            </div>
+
+       
+          </div>
+        ))}
+        
+        <!-- Sección de Beneficios y Servicios - Fuera del grid -->
+        <div class="relative w-full py-10 overflow-hidden">
+          <!-- Fondo SVG -->
+          <img src={rectangle.src} alt="Rectangle" class="absolute top-0 left-0 w-full h-full" />
+          
+          <div class="relative z-10 px-4 mx-auto max-w-7xl">
+            <div class="grid items-start grid-cols-1 gap-8 lg:grid-cols-3">
+              <!-- Beneficios -->
+              <div class="lg:col-span-1">
+                <h2 class="mb-8 text-3xl font-bold text-center text-verdeArk lg:text-left">BENEFICIOS</h2>
+                <div class="space-y-4">
+                  {requeriments.length > 0 && requeriments[0] ? (
+                    <div class="space-y-3 text-white">
+                      <div set:html={requeriments[0].text}></div>
+                    </div>
+                  ) : (
+                    <div class="space-y-3 text-white">
+                      <p>No hay beneficios disponibles.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <!-- Imagen central -->
+              <div class="flex justify-center lg:col-span-1">
+                <img 
+                  src={beneficios.src} 
+                  alt={beneficios.src} 
+                  class="object-contain w-full h-auto max-w-md"
+                />
+              </div>
+              
+              <!-- Servicios -->
+              <div class="lg:col-span-1">
+                <h2 class="mb-8 text-3xl font-bold text-center text-verdeArk lg:text-left">SERVICIOS</h2>
+                <div class="space-y-4">
+                  {servicios.length > 0 && servicios[0] ? (
+                    <div class="space-y-3 text-white">
+                      <div set:html={servicios[0].text}></div>
+                    </div>
+                  ) : (
+                    <div class="space-y-3 text-white">
+                      <p>No hay servicios disponibles.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Testimonios - Fuera del bucle de secciones -->
+             {testimonios && testimonios.length > 0 && (
+               <div class="mt-8">
+            {(() => {
+              console.log('🔍 Testimonios originales:', testimonios);
+              const validTestimonios = testimonios
+                .filter((testimonio: any) => testimonio && testimonio.imageUrl)
+                .filter((testimonio: any, index: number, self: any[]) => 
+                  index === self.findIndex((t: any) => t._id === testimonio._id)
+                );
+              console.log('🔍 Testimonios válidos después del filtro:', validTestimonios);
+              console.log('🔍 Cantidad de testimonios válidos:', validTestimonios.length);
+              
+              // Determinar el número de columnas según la cantidad de testimonios
+              const getGridCols = (count: number) => {
+                if (count === 1) return 'grid-cols-1';
+                if (count === 2) return 'grid-cols-1 md:grid-cols-2';
+                if (count === 3) return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+                return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+              };
+              
+              return (
+                <div class={`grid gap-4 ${getGridCols(validTestimonios.length)}`}>
+                  {validTestimonios.map((testimonio: any, index: number) => {
+          
+                    return (
+                      <div class="max-w-xs mx-auto overflow-hidden">
+                               <!-- Imagen principal -->
+                        <div class="flex justify-center h-48 ">
+                                 <img 
+                                   src={testimonio.imageUrl} 
+                                   alt={testimonio.first_name} 
+                            class="object-cover w-40 h-40 mt-4"
+                                 />
+                               </div>
+                               
+                               <!-- Contenido de la tarjeta -->
+                        <div class="p-3 text-center">
+                                 <!-- Nombre -->
+                          <h3 class="mb-1 text-sm font-bold text-black font-akira">
+                                   {testimonio.first_name?.toUpperCase()}
+                                 </h3>
+                                 
+                                 <!-- Descripción/Achievement -->
+                          <div class="mb-2">
+                            <p class="mb-1 text-xs font-bold text-verdeArk font-akira">
+                                     {testimonio.description?.toUpperCase()}
+                                   </p>
+                            <p class="text-xs underline text-verdeArk font-akira">
+                                     {testimonio.anio}
+                                   </p>
+                                 </div>
+                                 
+                                 <!-- Comentario -->
+                          <p class="text-xs leading-relaxed text-gray-700">
+                                   "{testimonio.comment}"
+                                 </p>
+                               </div>
+                             </div>
+                    );
+                  })}
+                           </div>
+              );
+            })()}
+                   </div>
+                 )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Datos para JavaScript -->
+  <script id="servicios-data" type="application/json" set:html={JSON.stringify(servicios)}></script>
+  <script id="turnos-data" type="application/json" set:html={JSON.stringify(turnos)}></script>
+
+  <!-- Modales -->
+  <Modal id="planModal" title="Plan de Estudios" />
+  <Modal id="horariosModal" title="Horarios" />
+  
+  <!-- Modal de Imagen del Turno -->
+  <div id="imageModal" class="fixed inset-0 z-50 items-center justify-center hidden p-4 bg-black bg-opacity-75">
+    <div class="relative bg-white rounded-lg max-w-6xl max-h-[90vh] overflow-hidden flex">
+      <!-- Contenido principal con imagen -->
+      <div class="flex-1 p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-800" id="imageModalTitle">Horario de Clases</h3>
+        </div>
+        <div class="flex justify-center">
+          <img 
+            id="modalImage" 
+            src="" 
+            alt="" 
+            class="max-w-full max-h-[70vh] object-contain rounded-lg"
+          />
+        </div>
+      </div>
+      
+ 
+    </div>
+         <!-- Panel de botones a la derecha -->
+      <div class="absolute top-0 right-0 flex flex-row items-center justify-center gap-4 p-4">
+        <!-- Botón de descargar -->
+    
+        
+        <!-- Botón de cerrar -->
+        <button 
+          onclick="window.closeImageModal()"
+          class="p-3 text-black transition-colors bg-white rounded-lg hover:text-red-500 hover:bg-white"
+          title="Cerrar"
+        >
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+        <button 
+        id="downloadImageBtn"
+        class="p-3 text-black transition-colors bg-white rounded-lg hover:text-verdeArk hover:bg-white"
+        title="Descargar imagen"
+      >
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </button>
+      </div>
+  </div>
+
+  <!-- Modal de éxito -->
+  <div id="successModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="relative w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
+        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-green-100 ">
+          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h3 class="mb-2 text-lg font-semibold text-center text-gray-900">¡Inscripción exitosa!</h3>
+        <p class="mb-6 text-sm text-center text-gray-600">Te contactaremos pronto para confirmar tu inscripción. Gracias por elegirnos.</p>
+        <button id="closeModal" class="w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+
+  // Función para actualizar contenido del modal de plan de estudios
+  function updatePlanModalContent(sectionIndex: number) {
+    const planContent = document.getElementById('planModal-content');
+    if (!planContent) return;
+    
+    const servicios = (window as any).serviciosData || [];
+    if (servicios.length > 0 && servicios[sectionIndex]) {
+      planContent.innerHTML = `
+        <div class="space-y-4">
+          <h4 class="text-xl font-bold text-moradoArk">${servicios[sectionIndex].title || 'Plan de Estudios'}</h4>
+          <div class="prose max-w-none">${servicios[sectionIndex].text || 'No hay información disponible.'}</div>
+        </div>
+      `;
+    } else {
+      planContent.innerHTML = '<p class="text-gray-600">No hay información de plan de estudios disponible.</p>';
+    }
+  }
+
+  // Función para actualizar contenido del modal de horarios
+  function updateHorariosModalContent(sectionIndex: number) {
+    const horariosContent = document.getElementById('horariosModal-content');
+    if (!horariosContent) return;
+    
+    const turnos = (window as any).turnosData || [];
+    if (turnos.length > 0 && turnos[sectionIndex] && Array.isArray(turnos[sectionIndex]) && turnos[sectionIndex].length > 0) {
+      const horariosHTML = turnos[sectionIndex].map((turno: any) => `
+        <div class="lg:p-6 p-2 bg-[#cbffdc] banner-cortado-ciclo mb-4">
+     <div class="grid grid-cols-3 gap-x-5">
+            <div class="space-y-1 border-r-2 border-black">
+              <p class="font-bold text-black">Inicio de clases</p>
+              <p class="text-black">${turno.start || 'Por definir'}</p>
+            </div>
+            <div class="space-y-1 border-r-2 border-black">
+              <p class="font-bold text-black">Duración</p>
+              <p class="text-black">${turno.duration || 'Por definir'}</p>
+            </div>
+            <div class="pb-2 space-y-1">
+              <p class="font-bold text-black">Horario</p>
+              <p class="text-black">${JSON.parse(turno.diasSeleccionados || '[]').join(' - ')}</p>
+              <p class="text-black">${turno.horaInicioClases} - ${turno.horaFinClases}</p>
+            </div>
+            <div class="space-y-1 border-r-2 border-black">
+              <p class="font-bold text-black">Matrícula</p>
+              <p class="text-black">${turno.enroll}</p>
+              <p class="text-sm text-black">(ex-alumnosArkited no pagan matrícula)</p>
+            </div>
+            <div class="space-y-1 border-r-2 border-black">
+              <p class="font-bold text-black">Mensualidad</p>
+              <p class="text-sm text-black">Presencial</p>
+              <p class="text-black">${turno.onsitePayment}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="font-bold text-black">Mensualidad</p>
+              <p class="text-sm text-black">Presencial</p>
+              <p class="text-black">${turno.onsitePayment}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      horariosContent.innerHTML = horariosHTML;
+    } else {
+      horariosContent.innerHTML = '<p class="text-gray-600">No hay horarios disponibles para este bloque.</p>';
+    }
+  }
+
+  // Sobrescribir las funciones de apertura de modales
+  function openPlanModal() {
+    const currentSection = document.querySelector('[data-tab-content]:not(.hidden)')?.getAttribute('data-tab-content');
+    const sectionIndex = currentSection ? parseInt(currentSection) - 1 : 0;
+    updatePlanModalContent(sectionIndex);
+    (window as any).openModal('planModal');
+  }
+
+  function openHorariosModal() {
+    const currentSection = document.querySelector('[data-tab-content]:not(.hidden)')?.getAttribute('data-tab-content');
+    const sectionIndex = currentSection ? parseInt(currentSection) - 1 : 0;
+    updateHorariosModalContent(sectionIndex);
+    (window as any).openModal('horariosModal');
+  }
+
+  // Función para inicializar el slider de testimonios
+  function initTestimoniosSlider() {
+    const container = document.getElementById('testimonios-container');
+    const prevBtn = document.getElementById('prev-testimonio');
+    const nextBtn = document.getElementById('next-testimonio');
+    const indicators = document.querySelectorAll('[data-slide]');
+    
+    if (!container || !prevBtn || !nextBtn) return;
+    
+    let currentSlide = 0;
+    const totalSlides = indicators.length;
+    
+    function updateSlider() {
+      if (!container) return;
+      const translateX = -currentSlide * 100;
+      container.style.transform = `translateX(${translateX}%)`;
+      
+      // Actualizar indicadores
+      indicators.forEach((indicator, index) => {
+        if (index === currentSlide) {
+          indicator.classList.remove('bg-gray-300');
+          indicator.classList.add('bg-moradoArk');
+        } else {
+          indicator.classList.remove('bg-moradoArk');
+          indicator.classList.add('bg-gray-300');
+        }
+      });
+    }
+    
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateSlider();
+    }
+    
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateSlider();
+    }
+    
+    function goToSlide(slideIndex: number) {
+      currentSlide = slideIndex;
+      updateSlider();
+    }
+    
+    // Event listeners
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+    
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => goToSlide(index));
+    });
+    
+    // Auto-play (opcional)
+    setInterval(nextSlide, 5000);
+  }
+
+  // Exponer funciones globalmente
+  (window as any).openPlanModal = openPlanModal;
+  (window as any).openHorariosModal = openHorariosModal;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Exponer datos globalmente para los modales
+    (window as any).serviciosData = JSON.parse(document.getElementById('servicios-data')?.textContent || '[]');
+    (window as any).turnosData = JSON.parse(document.getElementById('turnos-data')?.textContent || '[]');
+    
+    // Inicializar slider de testimonios
+    initTestimoniosSlider();
+    
+    // Event listener para cerrar modal al hacer clic fuera
+    document.getElementById('imageModal')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        (window as any).closeImageModal();
+      }
+    });
+    
+    const tabButtons = document.querySelectorAll('[data-tab]');
+    const tabContents = document.querySelectorAll('[data-tab-content]');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        const target = event.currentTarget as HTMLButtonElement;
+        const tabId = target.getAttribute('data-tab');
+        
+    
+        tabButtons.forEach(btn => {
+          btn.classList.remove('border-b-2', 'border-moradoArk', 'text-moradoArk');
+          btn.classList.add('text-gray-500');
+        });
+        
+     
+        target.classList.add('border-b-2', 'border-moradoArk', 'text-moradoArk');
+        target.classList.remove('text-gray-500');
+        
+        
+        tabContents.forEach(content => {
+          content.classList.add('hidden');
+        });
+        
+      
+        const activeContent = document.querySelector(`[data-tab-content="${tabId}"]`);
+        if (activeContent) {
+          activeContent.classList.remove('hidden');
+        }
+      });
+    });
+
+    // Funciones del modal de éxito
+    function showSuccessModal() {
+      const modal = document.getElementById('successModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function hideSuccessModal() {
+      const modal = document.getElementById('successModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    // Event listeners del modal
+    document.getElementById('closeModal')?.addEventListener('click', hideSuccessModal);
+
+    document.getElementById('successModal')?.addEventListener('click', function(e) {
+      if (e.target === this) {
+        hideSuccessModal();
+      }
+    });
+
+    // Manejo del formulario de inscripción
+    document.getElementById('inscriptionForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = this as HTMLFormElement;
+      const formData = new FormData(form);
+      const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalText = submitButton.textContent;
+      
+      // Validar campos
+      const nombre = formData.get('nombre');
+      const email = formData.get('email');
+      const telefono = formData.get('telefono');
+      const turno = formData.get('turno');
+      
+      console.log('📝 Datos del formulario de inscripción:', { nombre, email, telefono, turno });
+      
+      if (!nombre || !email || !telefono) {
+        alert('Por favor, complete todos los campos obligatorios.');
+        return;
+      }
+      
+      // Cambiar texto del botón
+      submitButton.textContent = 'Enviando...';
+      submitButton.disabled = true;
+      
+      try {
+        // Preparar datos para la API
+        const emailContent = {
+          mails: "informes@logical.edu.pe",
+          body: {
+            nombre: nombre,
+            email: email,
+            telefono: telefono,
+            turno: turno || 'No seleccionado',
+            tipo: 'Inscripción a ciclo',
+            ciclo: window.location.pathname.split('/').pop() || 'Ciclo desconocido'
+          },
+          subject: "Nueva inscripción - Arkited"
+        };
+        
+        console.log('📧 Datos a enviar:', emailContent);
+        
+        // Enviar a la API
+        const response = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(emailContent)
+        });
+        
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response ok:', response.ok);
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Resultado exitoso:', result);
+          form.reset();
+          showSuccessModal();
+        } else {
+          const errorData = await response.json();
+          console.error('❌ Error response:', errorData);
+          throw new Error(`Error ${response.status}: ${errorData.error || 'Error al enviar la inscripción'}`);
+        }
+      } catch (error) {
+        console.error('❌ Error completo:', error);
+        alert('Error al enviar la inscripción. Por favor, intenta nuevamente.');
+      } finally {
+        // Restaurar botón
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    });
+  });
+
+  // Función para cambiar tabs de turnos - Definida globalmente
+  function showTurnTab(turnNumber: number) {
+    console.log('🔄 Cambiando a turno:', turnNumber);
+    
+    // Obtener la sección activa actual
+    const currentSection = document.querySelector('[data-tab-content]:not(.hidden)');
+    if (!currentSection) {
+      console.log('❌ No se encontró sección activa');
+      return;
+    }
+    
+    // Ocultar todos los contenidos de turnos solo de la sección actual
+    const allTurnContents = currentSection.querySelectorAll(`[data-turn-content]`);
+    console.log('📦 Contenidos encontrados en sección actual:', allTurnContents.length);
+    allTurnContents.forEach((content, index) => {
+      content.classList.add('hidden');
+      console.log(`📦 Ocultando contenido ${index + 1}`);
+    });
+    
+    // Mostrar el contenido del turno seleccionado
+    const selectedTurn = currentSection.querySelector(`[data-turn-content="${turnNumber}"]`);
+    console.log('🎯 Turno seleccionado:', selectedTurn);
+    if (selectedTurn) {
+      selectedTurn.classList.remove('hidden');
+      console.log('✅ Mostrando turno seleccionado');
+      
+      // Actualizar el costo de matrícula del turno seleccionado
+      updateMatriculaCost(turnNumber);
+      
+      // Actualizar la imagen del turno
+      updateTurnImage(turnNumber);
+    } else {
+      console.log('❌ No se encontró el turno seleccionado');
+    }
+    
+    // Actualizar estilos de los botones de turno solo de la sección actual
+    const allTurnButtons = currentSection.querySelectorAll(`[data-turn-tab]`);
+    console.log('🔘 Botones encontrados en sección actual:', allTurnButtons.length);
+    allTurnButtons.forEach((button, index) => {
+      button.classList.remove('bg-black', 'text-white');
+      button.classList.add('bg-[#cbffdc]', 'text-black');
+      console.log(`🔘 Desactivando botón ${index + 1}`);
+    });
+    
+    // Activar el botón seleccionado
+    const selectedButton = currentSection.querySelector(`[data-turn-tab="${turnNumber}"]`);
+    console.log('🎯 Botón seleccionado:', selectedButton);
+    if (selectedButton) {
+      selectedButton.classList.remove('bg-[#cbffdc]', 'text-black');
+      selectedButton.classList.add('bg-black', 'text-white');
+      console.log('✅ Activando botón seleccionado');
+    } else {
+      console.log('❌ No se encontró el botón seleccionado');
+    }
+  }
+  
+  // Funciones globales para el modal de imagen
+  (window as any).openImageModal = function(imageUrl: string, imageTitle: string) {
+    console.log('🖼️ Abriendo modal de imagen:', imageUrl);
+    
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage') as HTMLImageElement;
+    const modalTitle = document.getElementById('imageModalTitle');
+    const downloadBtn = document.getElementById('downloadImageBtn');
+    
+    if (modal && modalImage && modalTitle) {
+      modalImage.src = imageUrl;
+      modalImage.alt = imageTitle;
+      modalTitle.textContent = imageTitle;
+      
+      // Configurar descarga
+      if (downloadBtn) {
+        downloadBtn.onclick = () => (window as any).downloadImage(imageUrl, imageTitle);
+      }
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    }
+  };
+  
+  (window as any).closeImageModal = function() {
+    console.log('❌ Cerrando modal de imagen');
+    
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = 'auto'; // Restaurar scroll del body
+    }
+  };
+  
+  (window as any).downloadImage = function(imageUrl: string, imageTitle: string) {
+    console.log('⬇️ Descargando imagen:', imageUrl);
+    
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `${imageTitle.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  // Función para actualizar la imagen del turno seleccionado
+  function updateTurnImage(turnNumber: number) {
+    console.log('🖼️ Actualizando imagen del turno:', turnNumber);
+    
+    // Obtener la sección activa actual
+    const currentSection = document.querySelector('[data-tab-content]:not(.hidden)');
+    if (!currentSection) {
+      console.log('❌ No se encontró sección activa para actualizar imagen');
+      return;
+    }
+    
+    const sectionIndex = parseInt(currentSection.getAttribute('data-tab-content') || '1') - 1;
+    const turnos = (window as any).turnosData || [];
+    
+    if (turnos.length > 0 && turnos[sectionIndex] && Array.isArray(turnos[sectionIndex])) {
+      const turnIndex = turnNumber - 1; // Convertir a índice basado en 0
+      const selectedTurn = turnos[sectionIndex][turnIndex];
+      
+      if (selectedTurn && selectedTurn.photoUrl) {
+        // Actualizar el botón del modal con la nueva imagen
+        const button = currentSection.querySelector(`button[onclick*="openImageModal"]`);
+        if (button) {
+          button.setAttribute('onclick', `window.openImageModal('${selectedTurn.photoUrl}', '${selectedTurn.nombreturno || selectedTurn.name || 'Imagen del turno'}')`);
+        }
+        console.log('✅ Botón de imagen actualizado:', selectedTurn.photoUrl);
+      } else {
+        console.log('❌ No se encontró photoUrl para el turno seleccionado');
+      }
+    } else {
+      console.log('❌ No se encontraron datos de turnos para actualizar imagen');
+    }
+  }
+  
+  // Función para actualizar el costo de matrícula según el turno seleccionado
+  function updateMatriculaCost(turnNumber: number) {
+    // Obtener los datos del turno seleccionado desde el DOM
+    const selectedTurnContent = document.querySelector(`[data-turn-content="${turnNumber}"]`);
+    if (selectedTurnContent) {
+      // Buscar el elemento que contiene el costo del turno
+      const costoElement = selectedTurnContent.querySelector('[data-turn-enroll]');
+      if (costoElement) {
+        const nuevoCosto = costoElement.getAttribute('data-turn-enroll');
+        console.log('💰 Nuevo costo de matrícula:', nuevoCosto);
+        
+        // Actualizar todos los elementos de costo de matrícula
+        const costoElements = document.querySelectorAll('[id^="costo-turno-"]');
+        costoElements.forEach(element => {
+          element.textContent = nuevoCosto || 'Por definir';
+        });
+      }
+    }
+  }
+  
+  // Hacer la función disponible globalmente
+  (window as any).showTurnTab = showTurnTab;
+</script> 

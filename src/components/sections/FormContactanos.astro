@@ -1,0 +1,263 @@
+---
+// import Vectorcontactanos from "../../assets/Vectorcontactanos.png";
+import { fetchWebInfo } from "../../services/api.js";
+import facebookIcon from '../../assets/FACEBOOK2.svg';
+import instagramIcon from '../../assets/INSTAGRAM2.svg';
+import youtubeIcon from '../../assets/YOUTUBE2.svg';
+import tiktokIcon from '../../assets/TIKTOK2.svg';
+import whatsappIcon from '../../assets/WHATSAPP2.svg';
+import phoneIcon from '../../assets/TELEFONO2.svg';
+import correoIcon from '../../assets/SOBRE_CORREO.svg';
+import llamadaIcon from '../../assets/LLAMADA.svg';
+import ubicacionIcon from '../../assets/UBICACION_2.svg';
+
+
+// Obtener información de contacto desde webinfos
+const webInfosResponse = await fetchWebInfo("arkited", [
+  "contactText",
+  "contactEmail",
+  "contactEmailLink",
+  "contactPhone",
+  "contactPhoneLink",
+  "contactPhone2",
+  "contactPhone2Link",
+  "contactAddress",
+  "contactAddressLink",
+  "footerFacebook",
+  "footerInstagram",
+  "footerYoutube",
+  "footerTiktok",
+  "footerWhatsapp",
+]);
+
+const WEBINFO = (webInfosResponse || []).reduce(
+  (acc: Record<string, string>, item: { field: string; info: string }) => {
+    acc[item.field] = item.info;
+    return acc;
+  },
+  {} as Record<string, string>
+);
+---
+
+<div class="flex flex-col items-center justify-center w-full gap-1 pt-8 mx-auto lg:w-4/5 lg:gap-8 md:flex-row lg:pt-0">
+  <div class="flex flex-col items-start flex-1 w-11/12 px-8 lg:max-w-md lg:px-4">
+    <h2 class="mb-8 text-3xl uppercase md:text-4xl text-moradoArk font-bebas">
+      {WEBINFO.contactText || "Ingresa tus datos, déjanos tu mensaje y te llamaremos pronto."}
+    </h2>
+    <div class="flex items-center gap-3 mb-4">
+      <img src={correoIcon.src} alt="Correo" class="w-10 h-10" />
+      <a href={WEBINFO.contactEmailLink || (WEBINFO.contactEmail ? `mailto:${WEBINFO.contactEmail}` : "#")} class="text-2xl break-words text-verdeArk">
+        {WEBINFO.contactEmail || "informes@logical.edu.pe"}
+      </a>
+    </div>
+    <div class="flex items-center gap-3 mb-4">
+      <img src={llamadaIcon.src} alt="Llamada" class="w-10 h-10" />
+      <div class="text-2xl text-verdeArk">
+        <a href={WEBINFO.contactPhoneLink || (WEBINFO.contactPhone ? `tel:${WEBINFO.contactPhone}` : "#")} class="block">
+          {WEBINFO.contactPhone || ""}
+        </a>
+        <a href={WEBINFO.contactPhone2Link || (WEBINFO.contactPhone2 ? `tel:${WEBINFO.contactPhone2}` : "#")} class="block">
+          {WEBINFO.contactPhone2 || ""}
+        </a>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 mb-4">
+      <img src={ubicacionIcon.src} alt="Ubicacion" class="w-10 h-10" />
+      <a href={WEBINFO.contactAddressLink || "#"} target="_blank" rel="noopener noreferrer" class="text-2xl text-verdeArk">
+        {WEBINFO.contactAddress || ""}
+      </a>
+    </div>
+  </div>
+
+  <div class="relative flex items-center justify-center flex-1  px-4 aspect-square min-h-[500px] lg:w-4/5 w-11/12 mx-auto">
+    <!-- <img src={Vectorcontactanos.src} alt="Fondo verde" class="absolute inset-0 z-0 object-contain w-full h-full" /> -->
+    <form
+      id="contactForm"
+      class="relative z-10 flex flex-col w-full gap-4 px-6 py-8 lg:w-3/5 bg-moradoArk button-cortado-form"
+      autocomplete="off"
+      data-contact-email={WEBINFO.contactEmail || "informes@logical.edu.pe"}
+    >
+      <!-- Sección VISITA NUESTRAS REDES -->
+      <div class="mb-6">
+        <h3 class="mb-4 text-lg font-bold text-center text-white uppercase">VISITA NUESTRAS REDES</h3>
+        <div class="grid grid-cols-2 p-4 rounded-lg lg:gap-x-20 gap-y-5 bg-verdeArk">
+          <a
+            href={WEBINFO.footerFacebook || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-end transition-colors rounded-lg "
+          >
+            <img src={facebookIcon.src} alt="Facebook" class="w-16 h-16 " />
+          </a>
+          <a
+            href={WEBINFO.footerInstagram || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-start transition-colors rounded-lg "
+          >
+            <img src={instagramIcon.src} alt="Instagram" class="w-16 h-16" />
+          </a>
+          <a
+            href={WEBINFO.footerTiktok || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-end transition-colors rounded-lg "
+          >
+            <img src={tiktokIcon.src} alt="TikTok" class="w-16 h-16" />
+          </a>
+          <a
+            href={WEBINFO.footerYoutube || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-start transition-colors rounded-lg "
+          > 
+            <img src={youtubeIcon.src} alt="YouTube" class="w-16 h-16" />
+          </a>
+        </div>
+      </div>
+
+      <!-- Sección COMUNICATE CON NOSOTROS -->
+      <div class="mb-6">
+        <h3 class="mb-4 text-lg font-bold text-center text-white uppercase">COMUNICATE CON NOSOTROS</h3>
+        <div class="flex gap-4 p-4 rounded-lg lg:gap-x-20 gap-y-5 bg-verdeArk">
+          <a
+            href={WEBINFO.footerWhatsapp || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-end flex-1 transition-colors rounded-lg "
+          >
+            <img src={whatsappIcon.src} alt="WhatsApp" class="w-16 h-16" />
+          </a>
+          <a
+            href={WEBINFO.contactPhoneLink || (WEBINFO.contactPhone ? `tel:${WEBINFO.contactPhone}` : "#")}
+          class="flex items-center justify-start flex-1 transition-colors rounded-lg "
+          >
+            <img src={phoneIcon.src} alt="Phone" class="w-16 h-16" />
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div id="successModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="relative w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
+      <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-green-100">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h3 class="mb-2 text-lg font-semibold text-center text-gray-900">¡Mensaje enviado!</h3>
+      <p class="mb-6 text-sm text-center text-gray-600">Te contactaremos pronto. Gracias por escribirnos.</p>
+      <button id="closeModal" class="w-full px-4 py-2 text-sm font-medium text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
+        Aceptar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSuccessModal() {
+    const modal = document.getElementById("successModal");
+    if (modal) {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+  }
+
+  function hideSuccessModal() {
+    const modal = document.getElementById("successModal");
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+  }
+
+  document.getElementById("closeModal")?.addEventListener("click", hideSuccessModal);
+
+  document.getElementById("successModal")?.addEventListener("click", function (e) {
+    if (e.target === this) {
+      hideSuccessModal();
+    }
+  });
+
+  const CONTACT_INFO = {
+    contactEmail: (document.getElementById("contactForm") as HTMLFormElement)?.getAttribute("data-contact-email") || "informes@logical.edu.pe",
+  };
+
+  document.getElementById("contactForm")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const form = this as HTMLFormElement;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton.textContent;
+
+    // Validar campos
+    const nombre = formData.get("nombre");
+    const email = formData.get("email");
+    const telefono = formData.get("telefono");
+    const mensaje = formData.get("mensaje");
+
+    console.log("📝 Datos del formulario:", { nombre, email, telefono, mensaje });
+
+    if (!nombre || !email || !telefono || !mensaje) {
+      alert("Por favor, complete todos los campos.");
+      return;
+    }
+
+    // Cambiar texto del botón
+    submitButton.textContent = "Enviando...";
+    submitButton.disabled = true;
+
+    try {
+      // Preparar datos para la API
+      const emailContent = {
+        mails: CONTACT_INFO.contactEmail,
+        body: {
+          nombre: nombre,
+          email: email,
+          telefono: telefono,
+          mensaje: mensaje,
+        },
+        subject: "Nuevo mensaje de contacto - Arkited",
+      };
+
+      console.log("📧 Datos a enviar:", emailContent);
+
+      // Enviar a la API externa
+      const response = await fetch("https://edtlab-cms-dev.herokuapp.com/api/admin/correo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          project: "arkited",
+        },
+        body: JSON.stringify(emailContent),
+      });
+
+      console.log("📡 Response status:", response.status);
+      console.log("📡 Response ok:", response.ok);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("✅ Resultado exitoso:", result);
+        form.reset();
+        showSuccessModal();
+      } else {
+        const errorData = await response.json();
+        console.error("❌ Error response:", errorData);
+        throw new Error(`Error ${response.status}: ${errorData.error || "Error al enviar el mensaje"}`);
+      }
+    } catch (error) {
+      console.error("❌ Error completo:", error);
+      alert("Error al enviar el mensaje. Por favor, intenta nuevamente.");
+    } finally {
+      // Restaurar botón
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+  });
+</script>

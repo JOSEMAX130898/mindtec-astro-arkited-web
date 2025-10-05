@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Welcome from '../components/Welcome.astro';
+import BlogImagenes from '../components/sections/BlogImagenes.astro';
+import BannerPrincipal from '../components/BannerPrincipal.astro';
+import BlogImg from '../assets/BannerBlog.png';
+import { getBlogInfo } from '../services/api.js';
+
+const blogData = await getBlogInfo();
+
+const titulo = blogData.blogTitle || blogData.blogTitle2 || "Blog";
+const subtitulo = blogData.blogSubtitle || "";
+const imagen = blogData.blogImage || BlogImg.src;
+const titulo2 = blogData.blogTitle2 || "";
+---
+
+<Layout title="Blog - Arkited">
+    <BannerPrincipal 
+      titulo={titulo}
+      subtitulo={subtitulo}
+      titulo2={titulo2}
+     
+      imagen={imagen} 
+    />
+
+ <BlogImagenes />
+</Layout>   

@@ -1,0 +1,91 @@
+/* Fuentes personalizadas - Gotham Rounded */
+
+@font-face {
+  font-family: 'AkiraExpandedDemo';
+  src: url('../assets/fonts/AkiraExpandedDemo.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ArchivoNarrow';
+  src: url('../assets/fonts/archivo-narrow.regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BebasNeue';
+  src: url('../assets/fonts/BebasNeue-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AkiraExpandedDemo';
+  src: url('../assets/fonts/AkiraExpandedDemo.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AkiraExpandedDemo';
+  src: url('../assets/fonts/AkiraExpandedDemo.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Establecer Gotham Rounded como fuente por defecto */
+html, body {
+  font-family: 'ArchivoNarrow', sans-serif;
+  font-weight: 400;
+}
+
+/* Clases de utilidad para usar las fuentes */
+.font-akira {
+  font-family: 'AkiraExpandedDemo', sans-serif;
+}
+
+.font-akira-book {
+  font-family: 'AkiraExpandedDemo', sans-serif;
+  font-weight: 400;
+}
+
+.font-akira-medium {
+  font-family: 'AkiraExpandedDemo', sans-serif;
+  font-weight: 500;
+}
+
+.font-akira-bold {
+  font-family: 'AkiraExpandedDemo', sans-serif;
+  font-weight: 700;
+}
+
+/* Clases de utilidad para Archivo Narrow */
+.font-archivo {
+  font-family: 'ArchivoNarrow', sans-serif;
+}
+
+.font-archivo-regular {
+  font-family: 'ArchivoNarrow', sans-serif;
+  font-weight: 400;
+} 
+.font-archivo-bold {
+  font-family: 'ArchivoNarrow', sans-serif;
+  font-weight: 700;
+}
+
+/* Clases de utilidad para BebasNeue */
+.font-bebas {
+  font-family: 'BebasNeue', sans-serif;
+}
+
+.font-bebas-regular {
+  font-family: 'BebasNeue', sans-serif;
+  font-weight: 400;
+} 

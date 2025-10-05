@@ -1,0 +1,500 @@
+---
+import { fetchSolutions, fetchUniversities } from '../../services/api.js';
+
+interface Solution {
+  _id: string;
+  name: string;
+  cycle: string;
+  files: string[];
+}
+
+interface Cycle {
+  _id: string;
+  name: string;
+  areas: string[];
+}
+
+
+const solutionsData: Solution[] = await fetchSolutions();
+const cyclesData: Cycle[] = await fetchUniversities();
+
+console.log('=== DEBUG API DATOS ===');
+console.log('Universidades/Ciclos:', cyclesData);
+console.log('Soluciones:', solutionsData);
+
+// Obtener el primer ciclo como predeterminado
+const currentCycle = cyclesData.length > 0 ? cyclesData[0] : null;
+
+// Obtener las soluciones del ciclo actual
+const currentSolutions = currentCycle 
+  ? solutionsData.filter(solution => solution.cycle === currentCycle._id)
+  : [];
+
+console.log('Ciclo actual:', currentCycle);
+console.log('Soluciones del ciclo actual:', currentSolutions);
+
+// Verificar si no hay datos disponibles
+const hasNoData = cyclesData.length === 0 || solutionsData.length === 0;
+
+// Función para generar las filas de datos
+function generateRows(selectedCycle: Cycle | null, solutions: Solution[]) {
+  if (!selectedCycle || hasNoData) {
+    return [
+      { 
+        anio: 'No disponible', 
+        areas: [
+          { nombre: 'No disponible', archivo: '#', disponible: false },
+          { nombre: 'No disponible', archivo: '#', disponible: false },
+          { nombre: 'No disponible', archivo: '#', disponible: false }
+        ]
+      }
+    ];
+  }
+
+  const cycleSolutions = solutions.filter(solution => solution.cycle === selectedCycle._id);
+  
+  if (cycleSolutions.length === 0) {
+    // Mantener al menos una fila con "No disponible"
+    const defaultAreas = selectedCycle.areas.length > 0 
+      ? selectedCycle.areas.map(area => ({
+          nombre: area,
+          archivo: '#',
+          disponible: false
+        }))
+      : [
+          { nombre: 'No disponible', archivo: '#', disponible: false },
+          { nombre: 'No disponible', archivo: '#', disponible: false },
+          { nombre: 'No disponible', archivo: '#', disponible: false }
+        ];
+    
+    return [
+      { 
+        anio: 'No disponible', 
+        areas: defaultAreas
+      }
+    ];
+  }
+
+  return cycleSolutions.map(solution => {
+    const areas = selectedCycle.areas.length > 0 
+      ? selectedCycle.areas 
+      : ['No disponible', 'No disponible', 'No disponible'];
+    
+    return {
+      anio: solution.name,
+      areas: areas.map((area, index) => ({
+        nombre: area,
+        archivo: solution.files[index] || '#',
+        disponible: solution.files[index] && solution.files[index] !== '#'
+      }))
+    };
+  });
+}
+
+const initialRows = generateRows(currentCycle, solutionsData);
+const numColumns = hasNoData ? 4 : (currentCycle?.areas?.length ? currentCycle.areas.length + 1 : 4);
+---
+
+<!-- Diseño móvil con Grid -->
+<div class="block w-4/5 max-w-md py-8 mx-auto space-y-2 sm:hidden" id="mobile-descarga">
+  <!-- Grid container para todas las filas -->
+  <div class="grid grid-cols-1 gap-2">
+    <!-- Fila del año con selector -->
+    <div class="grid grid-cols-2 gap-2 overflow-hidden text-white">
+      <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-800">Año de prueba</div>
+      <div class="flex items-center justify-between px-4 py-3 text-sm bg-green-500">
+        <span id="mobile-year-display">
+          {hasNoData ? 'No disponible' : (initialRows.length > 0 ? initialRows[0].anio : 'No disponible')}
+        </span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Filas de descarga dinámicas -->
+    <div id="mobile-download-rows" class="grid grid-cols-1 gap-1">
+      {hasNoData ? (
+        <>
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">No disponible</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">No disponible</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">No disponible</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : currentCycle?.areas?.map((area, index) => {
+        const areaData = initialRows.length > 0 && initialRows[0].areas[index] 
+          ? initialRows[0].areas[index] 
+          : { nombre: area, archivo: '#', disponible: false };
+        
+        return (
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">{area}</div>
+            <div class="flex px-4 py-3 text-sm bg-green-500">
+              {!hasNoData && areaData.disponible ? (
+                <a href={areaData.archivo} class="flex items-center" target="_blank" rel="noopener noreferrer">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12"></path>
+                  </svg>
+                  <span>Descargar</span>
+                </a>
+              ) : (
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  <span>No disponible</span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }) || (
+        <>
+          <div class="grid grid-cols-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-800">Aptitud académica</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-800">Matemáticas</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-800">Ciencias</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+</div>
+
+<!-- Tabla original para desktop -->
+<div class="flex-col items-center hidden w-full py-8 sm:flex">
+  <div class="flex flex-col w-full max-w-5xl space-y-4">
+    <!-- Header dinámico -->
+    <div class="grid text-xs text-center text-white bg-moradoArk sm:text-sm md:text-base" id="descarga-header">
+      <div class="px-2 py-2 sm:px-4">Año de prueba</div>
+      {hasNoData ? (
+        <>
+          <div class="px-2 py-2 sm:px-4">No disponible</div>
+          <div class="px-2 py-2 sm:px-4">No disponible</div>
+          <div class="px-2 py-2 sm:px-4">No disponible</div>
+        </>
+      ) : currentCycle?.areas?.map((area, index) => (
+        <div class={`px-2 sm:px-4 py-2 ${index === currentCycle.areas.length - 1 ? '' : ''}`}>
+          {area}
+        </div>
+      )) || (
+        <>
+          <div class="px-2 py-2 sm:px-4">Aptitud académica</div>
+          <div class="px-2 py-2 sm:px-4">Matemáticas</div>
+          <div class="px-2 py-2 sm:px-4">Ciencias</div>
+        </>
+      )}
+    </div>
+    
+    <!-- Contenido dinámico -->
+    <div id="descarga-content" class="space-y-2">
+      {initialRows.map((fila, filaIndex) => (
+        <div class="grid text-xs text-center bg-verdeArk sm:text-sm md:text-base" data-row-index={filaIndex} style={`grid-template-columns: repeat(${numColumns}, 1fr);`}>
+          <div class="px-2 py-2 text-white truncate sm:px-4">{hasNoData ? 'No disponible' : fila.anio}</div>
+          {fila.areas.map((area, index) => (
+            <div class={`px-2 sm:px-4 py-2 ${index === fila.areas.length - 1 ? '' : ''}`}>
+              {!hasNoData && area.disponible ? (
+                <a href={area.archivo} class="flex items-center justify-center gap-1 text-white truncate sm:gap-2 hover:text-blue-800" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
+                  </svg>
+                  <span class="hidden sm:inline">Descargar</span>
+                  <span class="sm:hidden">Desc</span>
+                </a>
+              ) : (
+                <span class="flex items-center justify-center gap-1 text-gray-400 truncate sm:gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span class="hidden sm:inline">No disponible</span>
+                  <span class="sm:hidden">No disp</span>
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ solutionsData, cyclesData }}>
+  // Función para generar filas de datos
+  function generateRows(selectedCycle, solutions) {
+    if (!selectedCycle || solutions.length === 0) {
+      return [
+        { 
+          anio: 'No disponible', 
+          areas: [
+            { nombre: 'No disponible', archivo: '#', disponible: false },
+            { nombre: 'No disponible', archivo: '#', disponible: false },
+            { nombre: 'No disponible', archivo: '#', disponible: false }
+          ]
+        }
+      ];
+    }
+
+    const cycleSolutions = solutions.filter(solution => solution.cycle === selectedCycle._id);
+    
+    if (cycleSolutions.length === 0) {
+      // Mantener al menos una fila con "No disponible"
+      const defaultAreas = selectedCycle.areas.length > 0 
+        ? selectedCycle.areas.map(area => ({
+            nombre: area,
+            archivo: '#',
+            disponible: false
+          }))
+        : [
+            { nombre: 'No disponible', archivo: '#', disponible: false },
+            { nombre: 'No disponible', archivo: '#', disponible: false },
+            { nombre: 'No disponible', archivo: '#', disponible: false }
+          ];
+      
+      return [
+        { 
+          anio: 'No disponible', 
+          areas: defaultAreas
+        }
+      ];
+    }
+
+    return cycleSolutions.map(solution => {
+      const areas = selectedCycle.areas.length > 0 
+        ? selectedCycle.areas 
+        : ['No disponible', 'No disponible', 'No disponible'];
+      
+      return {
+        anio: solution.name,
+        areas: areas.map((area, index) => ({
+          nombre: area,
+          archivo: solution.files[index] || '#',
+          disponible: solution.files[index] && solution.files[index] !== '#'
+        }))
+      };
+    });
+  }
+  
+  // Función para actualizar la tabla de descarga
+  function updateDescargaTable(universityId, areas) {
+    console.log('Actualizando tabla de descarga para universidad:', universityId);
+    console.log('Áreas:', areas);
+    
+    // Verificar si no hay datos disponibles
+    const hasNoData = cyclesData.length === 0 || solutionsData.length === 0;
+    
+    // Encontrar el ciclo seleccionado
+    const selectedCycle = cyclesData.find(cycle => cycle._id === universityId);
+    
+    // Generar nuevas filas
+    const newRows = generateRows(selectedCycle, solutionsData);
+    
+    // Calcular el número de columnas
+    const areasToShow = hasNoData ? ['No disponible', 'No disponible', 'No disponible'] : (areas.length > 0 ? areas : ['No disponible', 'No disponible', 'No disponible']);
+    const numColumns = areasToShow.length + 1;
+    
+    // Actualizar el header
+    const header = document.getElementById('descarga-header');
+    if (header) {
+      header.className = `grid text-center text-white  bg-moradoArk text-xs sm:text-sm md:text-base`;
+      header.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
+      
+      header.innerHTML = `
+        <div class="px-2 py-2 sm:px-4">Año de prueba</div>
+        ${hasNoData ? 
+          '<div class="px-2 py-2 sm:px-4">No disponible</div><div class="px-2 py-2 sm:px-4">No disponible</div><div class="px-2 py-2 sm:px-4">No disponible</div>' :
+          areasToShow.map((area, index) => 
+            `<div class="px-2 sm:px-4 py-2 ${index === areasToShow.length - 1 ? '' : ''}">${area}</div>`
+          ).join('')
+        }
+      `;
+    }
+    
+    // Actualizar el contenido
+    const content = document.getElementById('descarga-content');
+    if (content) {
+      content.className = 'space-y-2';
+      content.innerHTML = newRows.map((fila, filaIndex) => `
+        <div class="grid text-xs text-center bg-verdeArk sm:text-sm md:text-base" data-row-index="${filaIndex}" style="grid-template-columns: repeat(${numColumns}, 1fr);">
+          <div class="px-2 py-2 text-white truncate sm:px-4">${hasNoData ? 'No disponible' : fila.anio}</div>
+          ${fila.areas.map((area, index) => `
+            <div class="px-2 sm:px-4 py-2 ${index === fila.areas.length - 1 ? '' : ''}">
+              ${!hasNoData && area.disponible ? `
+                <a href="${area.archivo}" class="flex items-center justify-center gap-1 text-white truncate sm:gap-2 hover:text-blue-800" target="_blank" rel="noopener noreferrer">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
+                  </svg>
+                  <span class="hidden sm:inline">Descargar</span>
+                  <span class="sm:hidden">Desc</span>
+                </a>
+              ` : `
+                <span class="flex items-center justify-center gap-1 text-gray-400 truncate sm:gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span class="hidden sm:inline">No disponible</span>
+                  <span class="sm:hidden">No disp</span>
+                </span>
+              `}
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+    
+    // Actualizar la vista móvil
+    updateMobileView(selectedCycle, newRows, areasToShow);
+  }
+  
+  // Función para actualizar la vista móvil
+  function updateMobileView(selectedCycle, newRows, areasToShow) {
+    // Verificar si no hay datos disponibles
+    const hasNoData = cyclesData.length === 0 || solutionsData.length === 0;
+    
+    // Actualizar el año mostrado
+    const yearDisplay = document.getElementById('mobile-year-display');
+    if (yearDisplay && newRows.length > 0) {
+      yearDisplay.textContent = newRows[0].anio;
+    }
+    
+    // Actualizar las filas de descarga móviles
+    const mobileRows = document.getElementById('mobile-download-rows');
+    if (mobileRows) {
+      if (hasNoData) {
+        mobileRows.innerHTML = `
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">No disponible</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">No disponible</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+            <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">No disponible</div>
+            <div class="flex items-center justify-center px-4 py-3 text-sm bg-green-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span>No disponible</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        mobileRows.innerHTML = areasToShow.map((area, index) => {
+          const areaData = newRows.length > 0 && newRows[0].areas[index] 
+            ? newRows[0].areas[index] 
+            : { nombre: area, archivo: '#', disponible: false };
+          
+          return `
+            <div class="grid grid-cols-2 gap-2 overflow-hidden text-white ">
+              <div class="flex items-center px-4 py-3 text-sm font-medium bg-gray-700">${area}</div>
+              <div class="flex px-4 py-3 text-sm bg-green-500">
+                ${!hasNoData && areaData.disponible ? `
+                  <a href="${areaData.archivo}" class="flex items-center" target="_blank" rel="noopener noreferrer">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12"></path>
+                    </svg>
+                    <span>Descargar</span>
+                  </a>
+                ` : `
+                  <div class="flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <span>No disponible</span>
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  }
+  
+
+  document.addEventListener('universitySelected', (event) => {
+    const customEvent = event;
+    const { universityId, areas } = customEvent.detail;
+    updateDescargaTable(universityId, areas);
+  });
+</script>

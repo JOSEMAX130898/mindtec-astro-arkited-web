@@ -1,0 +1,62 @@
+---
+
+// import NotaImagen from '../../assets/NotaImagen.png';
+import ImagenSolucionario from '../../../public/img/beneficios.png';
+---
+
+<section class="relative w-full pb-12 lg:pb-28 lg:pt-10">
+
+  <div class="absolute z-20 hidden top-10 left-52 lg:block">
+    <img src={ImagenSolucionario.src} alt="Solucionario" class="w-auto h-auto lg:h-56 lg:w-auto lg:-translate-y-8 lg:scale-125" />
+  </div>
+  
+  <div class="w-4/5 p-0 mx-auto lg:px-6 lg:max-w-7xl bg-moradoArk banner-cortado-2">
+    <!-- Layout móvil -->
+    <div class="flex flex-col items-center py-6 lg:hidden">
+      <div class="flex items-center justify-center mb-4">
+        <img src={ImagenSolucionario.src} alt="Solucionario" class="object-contain w-full h-full" />
+      </div>
+      <div class="text-left lg:text-center">
+        <h2 class="mb-2 text-2xl text-verdeArk font-akira-bold">
+          Solucionarios
+        </h2>
+        <p class="mb-4 text-sm text-white">
+          Ingresa y descarga<br />
+          todos nuestros recursos<br />
+          que tenemos para ti.
+        </p>
+
+        <a class="w-32 py-2 text-base text-white transition-colors font-akira-bold bg-verdeArk hover:bg-verdeArk/90 button-cortado " href="/solucionario">
+          Ingresar
+        </a>
+   
+      </div>
+    </div>
+
+    <!-- Layout desktop -->
+    <div class="flex-col items-center justify-start hidden px-3 py-4 mx-auto lg:flex lg:gap-24 md:flex-row lg:w-11/12">
+      
+      <div class="relative flex items-center justify-center w-full h-full mb-4 lg:mb-0">
+        <div class="relative z-10 flex items-center justify-start w-full h-full px-1 lg:justify-end lg:px-12">
+          <div class="max-w-sm text-center transform translate-x-8 lg:text-left lg:max-w-lg lg:translate-x-0">
+            <h2 class="mb-2 text-xl text-center font-akira-bold text-verdeArk lg:text-left md:text-2xl lg:text-3xl">
+              Solucionarios
+            </h2>
+            <p class="mb-4 text-sm text-white lg:text-xl xl:text-2xl font-archivo-regular">
+              Ingresa y descarga
+              todos nuestros <br /> recursos
+              que tenemos para ti.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="w-full lg:w-2/4">
+        <a class=" w-32 !py-2 text-base text-white transition-colors font-akira-bold button-cortado lg:text-2xl bg-verdeArk hover:bg-verdeArk/90" href="/solucionario">
+            Ingresar
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</section>

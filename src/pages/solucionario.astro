@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BannerPrincipal from '../components/BannerPrincipal.astro';
+import Unis from '../components/sections/Unis.astro';
+import Descarga from '../components/sections/Descarga.astro';
+import BannerSolucionario from '../assets/BannerSolucionario.png';
+import { fetchWebInfo } from '../services/api.js';
+
+// Obtener información específica para solucionario
+const solutionsInfo = await fetchWebInfo("arkited", [
+  "solutionsTitle",
+  "solutionsTitle2", 
+  "solutionsSubtitle",
+  "solutionsImage"
+]);
+
+// Formatear los datos
+const formattedData = solutionsInfo.reduce((acc: any, item: any) => {
+  acc[item.field] = item.info;
+  return acc;
+}, {});
+
+// Usar los datos de la API o valores por defecto
+const titulo = formattedData.solutionsTitle || "Solucionario";
+const subtitulo = formattedData.solutionsSubtitle || "";
+const imagen = formattedData.solutionsImage || BannerSolucionario.src;
+const titulo2 = formattedData.solutionsTitle2 || "";
+---
+
+<Layout title="Solucionario - Arkited">
+<BannerPrincipal 
+  titulo={titulo} 
+  subtitulo={subtitulo}
+  titulo2={titulo2}
+  imagen={imagen} 
+/>
+<Unis/>
+<Descarga/>
+</Layout> 

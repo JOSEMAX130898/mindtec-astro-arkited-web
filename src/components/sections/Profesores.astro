@@ -1,0 +1,166 @@
+---
+// import ProfesoresImg from '../../assets/teacher.png';
+import { fetchTeachers } from '../../services/api.js';
+import { getTeacherInfo } from '../../services/api.js';
+
+const teacherData = await getTeacherInfo();
+const titulo = teacherData.teachersBannerTitle
+const teachersQuote = teacherData.teachersQuoteQuill
+const teacherDescription = teacherData.teachersDescriptionQuill
+
+
+interface Teacher {
+  _id: string;
+  name: string;
+  course: string;
+  comment?: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  imageUrl?: string;
+}
+
+// Obtener datos de profesores desde la API
+const teachersData: Teacher[] = (await fetchTeachers()) || [];
+
+const profesores = teachersData.length > 0
+  ? teachersData.map(teacher => ({
+      nombre: teacher.name,
+      curso: teacher.course,
+      descripcion: teacher.comment || 'Docente principal, con experiencia en campo y una didáctica infalible.',
+      img: teacher.imageUrl || '/img/logoHeader.png',
+    }))
+  : [
+      {
+        nombre: 'Rubén Ibañez',
+        curso: 'Arquitectura',
+        descripcion: 'Docente principal, con experiencia en campo y una didáctica infalible.',
+        img: '/img/logoHeader.png',
+      }
+    ];
+---
+
+<script>
+  // Script para el carrusel móvil
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('profesores-mobile-carousel');
+    const slides = carousel?.querySelectorAll('.profesores-carousel-slide');
+    const prevBtn = document.getElementById('profesores-prev-btn');
+    const nextBtn = document.getElementById('profesores-next-btn');
+    const indicators = document.querySelectorAll('.profesores-carousel-indicator');
+    
+    let currentSlide = 0;
+    const totalSlides = slides?.length || 0;
+
+    function showSlide(index: number) {
+      if (!slides) return;
+      
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('hidden', i !== index);
+      });
+      
+      // Solo actualizar los 3 indicadores visibles
+      indicators.forEach((indicator, i) => {
+        // Calcular qué indicador debe estar activo basado en el slide actual
+        const activeIndicator = index % 3;
+        indicator.classList.toggle('bg-verdeArk', i === activeIndicator);
+        indicator.classList.toggle('bg-gray-300', i !== activeIndicator);
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    // Event listeners
+    nextBtn?.addEventListener('click', nextSlide);
+    prevBtn?.addEventListener('click', prevSlide);
+
+    // Auto-play (opcional)
+    setInterval(nextSlide, 5000);
+
+    // Inicializar
+    showSlide(0);
+  });
+</script>
+
+<section class="w-full px-4 lg:pt-12 lg:pb-40 md:px-12">
+  <div class="flex flex-col mx-auto md:flex-row md:items-center md:gap-8 max-w-7xl">
+    <div class="mb-8 md:w-1/3 md:mb-0">
+      <h2 class="mb-4 text-4xl font-medium leading-tight text-verdeArk font-akira-bold">{titulo}</h2>
+    </div>
+    <div class="flex flex-col md:w-2/3">
+      <p class="text-base text-moradoArk md:text-lg" set:html={teachersQuote}>
+  </p>
+  <p class="text-base font-bold text-moradoArk md:text-lg" set:html={teacherDescription}>
+  </p>
+    </div>
+
+  </div>
+  
+  <!-- Carrusel para móvil - Solo visible en pantallas pequeñas -->
+  <div id="profesores-mobile-carousel" class="block mx-auto mt-10 lg:hidden max-w-7xl">
+    <div class="relative">
+      {profesores.map((prof, index) => (
+        <div class={`profesores-carousel-slide flex flex-col items-center p-6 text-center transition-shadow ${index === 0 ? '' : 'hidden'}`}>
+          <div class="relative flex items-center justify-center w-32 h-32 mx-auto mb-4">
+            <img src={prof.img} alt={prof.nombre} class="object-contain w-full h-full rounded-full" draggable="false" />
+          </div>
+          <h3 class="mb-2 text-lg font-medium text-verdeArk font-akira-bold">{prof.nombre}</h3>
+          <p class="mb-1 text-sm font-medium text-verdeArk">{prof.curso}</p>
+          <p class="px-4 mb-3 text-sm text-gray-600">{prof.descripcion}</p>
+        </div>
+      ))}
+      
+      {/* Botones de navegación */}
+      <button 
+        id="profesores-prev-btn" 
+        class="absolute left-0 p-2 transition-colors transform -translate-y-1/2 rounded-full top-1/2 "
+        aria-label="Slide anterior"
+      >
+        <svg class="w-6 h-6 text-verdeArk" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      
+      <button 
+        id="profesores-next-btn" 
+        class="absolute right-0 p-2 transition-colors transform -translate-y-1/2 rounded-full top-1/2 "
+        aria-label="Siguiente slide"
+      >
+        <svg class="w-6 h-6 text-verdeArk" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </div>
+    
+    {/* Indicadores - Solo 3 dots */}
+    <div class="flex justify-center my-6 space-x-2">
+      {Array.from({ length: 3 }, (_, index) => (
+        <button 
+          class={`profesores-carousel-indicator w-3 h-3 rounded-full transition-colors ${index === 0 ? 'bg-verdeArk' : 'bg-gray-300'}`}
+          aria-label={`Ir al slide ${index + 1}`}
+        ></button>
+      ))}
+    </div>
+  </div>
+
+  <!-- Grid para desktop - Solo visible en pantallas grandes -->
+  <div class="hidden grid-cols-1 gap-8 mx-auto mt-10 sm:grid-cols-2 lg:grid lg:grid-cols-3 xl:grid-cols-4 max-w-7xl">
+    {profesores.map((prof, idx) => (
+      <div class="flex flex-col items-center p-6 text-center transition-shadow ">
+        <div class="relative flex items-center justify-center w-48 h-48 mx-auto mb-4">
+          <img src={prof.img} alt={prof.nombre} class="object-contain w-full h-full rounded-full" draggable="false" />
+        </div>
+        <h3 class="mb-2 text-xl font-medium text-verdeArk font-akira-bold">{prof.nombre}</h3>
+        <p class="mb-2 text-sm font-medium text-verdeArk">{prof.curso}</p>
+        <p class="mb-3 text-sm text-gray-600">{prof.descripcion}</p>
+      </div>
+    ))}
+  </div>
+</section> 

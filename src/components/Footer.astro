@@ -1,0 +1,123 @@
+---
+// Puedes personalizar los enlaces o textos como desees
+import logoArkited from '../../public/img/logoHeader.png';
+import { getFooterInfo } from '../services/api';
+import facebookIcon from '../assets/FACEBOOK2.svg';
+import instagramIcon from '../assets/INSTAGRAM2.svg';
+import youtubeIcon from '../assets/YOUTUBE2.svg';
+import tiktokIcon from '../assets/TIKTOK2.svg';
+import whatsappIcon from '../assets/WHATSAPP2.svg';
+
+const footerData = await getFooterInfo();
+
+const email = footerData.footerEmail || "";
+const emailLink = footerData.footerEmailLink || "";
+const phone = footerData.footerPhone || "";
+const phoneLink = footerData.footerPhoneLink || "";
+const phone2 = footerData.footerPhone2 || "";
+const phone2Link = footerData.footerPhone2Link || "";
+const address = footerData.footerAddress || "";
+const addressLink = footerData.footerAddressLink || "";
+const facebook = footerData.footerFacebook || "";
+const whatsapp = footerData.footerWhatsapp || "";
+const youtube = footerData.footerYoutube || "";
+const instagram = footerData.footerInstagram || "";
+const tiktok = footerData.footerTiktok || "";
+const whatsappLink = footerData.footerWhatsapp || "";
+
+---
+
+<footer class="px-10 py-5 text-white lg:px-6 lg:py-10 bg-moradoArk">
+  <div class="max-w-screen-xl mx-auto">
+    <!-- Primera fila en blanco -->
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+      <div class="space-y-3 ">
+        <img src={logoArkited.src} alt="Arkited" class="w-1/3 mb-5 lg:w-1/2 lg:my-5" />
+      </div>
+      <div class="items-end hidden lg:flex ">
+      <h3 class="hidden mb-3 text-sm font-bold uppercase font-akira-bold lg:block">Preparación</h3>
+      </div>
+      <div class="items-end hidden lg:flex">
+        <h3 class="hidden mb-3 text-sm font-bold uppercase font-akira-bold lg:block">Acerca de</h3>
+        </div>
+        <div class="items-end hidden lg:flex">
+          <h3 class="hidden mb-3 text-sm font-bold uppercase font-akira-bold lg:block">Academias</h3>
+          </div>
+      
+
+    </div>
+    
+
+    
+    <!-- Segunda fila con el contenido -->
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+      <!-- Columna 1: Logo + contacto -->
+      <div class="space-y-3">
+
+        <div class="space-y-1 text-sm">
+          <a href={`mailto:${emailLink}`}>{email}</a><br>
+          <a href={`tel:${phoneLink}`}>{phone} / {phone2}</a><br>
+          {/* @ts-ignore */}
+          <a 
+          href={addressLink || `https://www.google.com/maps?q=${encodeURIComponent(address)}`} 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          {address}
+        </a>
+        
+        </div>
+        <div class="flex flex-row items-center gap-2">
+          <a href={facebook} target="_blank" rel="noopener noreferrer">
+            <img src={facebookIcon.src} alt="Facebook" class="w-6 h-6" />
+          </a>
+          <a href={instagram} target="_blank" rel="noopener noreferrer">
+            <img src={instagramIcon.src} alt="Instagram" class="w-6 h-6" />
+          </a>
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+            <img src={whatsappIcon.src} alt="WhatsApp" class="w-6 h-6" />
+          </a>
+          <a href={youtube} target="_blank" rel="noopener noreferrer">
+            <img src={youtubeIcon.src} alt="YouTube" class="w-6 h-6" />
+          </a>
+          <a href={tiktok} target="_blank" rel="noopener noreferrer">
+            <img src={tiktokIcon.src} alt="TikTok" class="w-6 h-6" />
+          </a>
+        </div>
+      </div>
+
+      <!-- Columna 2: Preparación -->
+      <div>
+        <h3 class="mb-3 text-sm font-bold uppercase font-akira-bold lg:hidden">Preparación</h3>
+        <ul class="space-y-1 text-sm">
+          <li><a href="/ciclos" class="transition-colors hover:text-green-500">Semestral</a></li>
+          <li><a href="/ciclos" class="transition-colors hover:text-green-500">Intensivo</a></li>
+          <li><a href="/ciclos" class="transition-colors hover:text-green-500">Básico</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Acerca de -->
+      <div>
+        <h3 class="mb-3 text-sm font-bold uppercase font-akira-bold lg:hidden">Acerca de</h3>
+        <ul class="space-y-1 text-sm">
+          <li><a href="/nosotros" class="transition-colors hover:text-green-500">Nosotros</a></li>
+          <li><a href="/ciclos" class="transition-colors hover:text-green-500">Semestral</a></li>
+          <li><a href="/ciclos" class="transition-colors hover:text-green-500">Repaso</a></li>
+          <li><a href="/ciclos" class="transition-colors hover:text-green-500">Verano</a></li>
+          <li><a href="/eventos" class="transition-colors hover:text-green-500">Eventos</a></li>
+          <li><a href="/galeria" class="transition-colors hover:text-green-500">Galería</a></li>
+          <li><a href="/blog" class="transition-colors hover:text-green-500">Blog</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Academias -->
+      <div>
+        <h3 class="mb-3 text-sm font-bold uppercase font-akira-bold lg:hidden">Academias</h3>
+        <ul class="space-y-1 text-sm">
+          <li><a href="https://educatronics.com/" target="_blank" class="transition-colors hover:text-green-500">EDUCATRONIC - Robótica</a></li>
+          <li><a href="https://logical.edu.pe/" target="_blank" class="transition-colors hover:text-green-500">LOGICAL - Academia</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>

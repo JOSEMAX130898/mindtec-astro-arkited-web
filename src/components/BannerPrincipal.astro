@@ -1,0 +1,61 @@
+---
+import rectangle from '../assets/Rectangle.png';
+
+export interface Props {
+  titulo: string;
+  imagen: string;
+  subtitulo?: string;
+  boton?: string;
+  enlace?: string;
+  titulo2?: string;
+}
+
+const { titulo, imagen, subtitulo, boton, enlace, titulo2 } = Astro.props;
+---
+
+<div class="overflow-hidden lg:mt-0">
+  <!-- Contenido principal -->
+  <div class="w-full ">
+    <div class="relative flex flex-col items-start justify-between flex-shrink-0 w-full min-w-full pt-10 lg:items-center lg:py-0 md:py-0 lg:flex-row">
+      <!-- Fondo SVG -->
+      <img src={rectangle.src} alt="Rectangle" class="absolute top-0 left-0 w-full h-full" />
+
+      <!-- Imagen principal -->
+      <div class="relative z-10 flex items-center justify-center order-2 w-full xl:w-8/12 md:w-1/2 lg:mb-0 lg:order-2">
+        <img src={imagen} alt="Imagen principal" class="max-h-[300px] lg:max-h-[800px] w-auto relative" />
+      </div>
+
+      <!-- Contenido -->
+    
+        <div class="z-10 flex flex-col order-1 w-11/12 mx-auto lg:w-auto lg:pl-8 gap-y-7 lg:mx-20 lg:order-1">
+          <div class="flex flex-col justify-start w-auto gap-1 lg:gap-3">
+            <div class="flex flex-col justify-start px-2 py-2 lg:px-4 lg:py-2 bg-verdeArk w-fit banner-cortado-banner">
+              <h2 class="w-auto py-4 pb-2 pr-3 text-3xl font-semibold text-black lg:pb-3 font-akira lg:text-5xl lg:pr-5">{titulo}</h2>
+              {subtitulo && (
+                <div class="w-full border-b-2 border-black"></div>
+                <p class="py-2 mr-10 text-lg font-normal text-black lg:text-2xl whitespace-nowrap">{subtitulo}</p>
+              )}
+          
+            </div>
+         <div class="flex flex-col gap-5 w-fit button-cortado-sm">
+      
+         </div>
+          {titulo2 && (
+               <div class="max-w-md w-fit">
+                 <p class="text-lg font-normal break-words lg:text-5xl text-verdeArk font-akira">{titulo2}</p>
+               </div>
+             )}
+         {boton && (
+              <div>
+                <a href={enlace || "#"} class="inline-block px-6 py-2 text-lg font-semibold text-black transition font-akira bg-verdeArk">
+                  {boton}
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+  
+    
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+---
+export interface Props {
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<div id={id} class="fixed inset-0 z-50 items-center justify-center hidden">
+  <div class="absolute inset-0 bg-black bg-opacity-50" id={`${id}-backdrop`}></div>
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow-xl overflow-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <h3 class="text-2xl font-bold text-moradoArk">{title}</h3>
+        <button 
+          id={`${id}-close-btn`}
+          class="p-2 text-gray-400 transition-colors hover:text-gray-600"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div id={`${id}-content`} class="space-y-4">
+          <!-- Contenido dinámico se insertará aquí -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(modalId: string) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeModal(modalId: string) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  // Exponer funciones globalmente
+  (window as any).openModal = openModal;
+  (window as any).closeModal = closeModal;
+
+  // Agregar event listeners cuando se carga el DOM
+  document.addEventListener('DOMContentLoaded', function() {
+    // Buscar todos los modales y agregar event listeners
+    const modals = document.querySelectorAll('[id$="Modal"]');
+    modals.forEach(modal => {
+      const modalId = modal.id;
+      const closeBtn = document.getElementById(`${modalId}-close-btn`);
+      const backdrop = document.getElementById(`${modalId}-backdrop`);
+      
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal(modalId));
+      }
+      
+      if (backdrop) {
+        backdrop.addEventListener('click', () => closeModal(modalId));
+      }
+    });
+  });
+</script>

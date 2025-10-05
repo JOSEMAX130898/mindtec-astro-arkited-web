@@ -1,0 +1,64 @@
+---
+import HighlightBanner from "../common/HighlightBanner.astro";
+import CourseTypeCard from "../common/CourseTypeCard.astro";
+import { fetchCycles } from '../../services/api.js';
+import semestral from "../../../public/semestral.png";
+import intensivo from "../../../public/intensivo.png";
+import basico from "../../../public/basico.png";
+import arquitecta from "../../../public/arquitecta.png";
+import vector from "../../../public/Vector.png"
+
+interface Ciclo {
+  id: string;
+  link: string;
+  name: string;
+  imageUrl: string;
+}
+
+const ciclosData: Ciclo[] = await fetchCycles() || [];
+---
+
+<div class="relative flex items-center justify-center lg:h-[700px] bg-cover bg-right lg:bg-center bg-no-repeat lg:bg-contain" style="background-image: url('/Vector.png');">
+  <div class="relative flex flex-row w-full mx-auto lg:flex-col md:w-4/5 md:block">
+    <img src={arquitecta.src} alt="Estudiante"
+      class="relative mx-auto mb-4 md:absolute lg:absolute md:left-16 lg:left-16 md:bottom-0 lg:bottom-[-250px] md:mx-0 md:mb-0 z-10 w-48 h-auto lg:w-auto lg:block hidden"
+      style="object-fit: contain;" />
+
+    <div class="relative z-20 flex flex-row items-center justify-center w-full ml-auto lg:flex-col md:w-1/2 md:items-start">
+      <div class="flex flex-col items-center justify-center gap-6 md:gap-10">
+        <h2 class="mb-4 text-2xl font-semibold text-center text-moradoArk lg:block sm:text-3xl md:text-5xl md:text-center">¿quieres ingresar a arquitectura?</h2>
+        
+        {/* Versión móvil - Horizontal */}
+        <div class="flex flex-row items-center justify-center w-full gap-2 mb-2 md:hidden">
+          {ciclosData && ciclosData.slice(0, 3).map((ciclo: Ciclo, index: number) => {
+            const imagenes = [semestral, intensivo, basico];
+            return (
+              <CourseTypeCard 
+                tipo={imagenes[index] || semestral} 
+                nombre={ciclo.name} 
+              />
+            );
+          })}
+        </div>
+        
+        {/* Versión desktop - Horizontal */}
+        <div class="flex-row items-center hidden w-auto gap-6 md:flex">
+          {ciclosData && ciclosData.slice(0, 3).map((ciclo: Ciclo, index: number) => {
+            const imagenes = [semestral, intensivo, basico];
+            return (
+              <CourseTypeCard 
+                tipo={imagenes[index] || semestral} 
+                nombre={ciclo.name} 
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="w-11/12 py-10 mx-auto lg:mt-20 md:w-3/4 lg:py-0">
+  <div class="w-full">
+    <HighlightBanner />
+  </div>
+</div>

@@ -1,0 +1,52 @@
+---
+import GaleriaIsla from "../../islands/GaleriaIsla";
+import { fetchGallery } from "../../services/api.js";
+
+interface GalleryImage {
+  _id: string;
+  description?: string;
+  image_url?: string;
+  tag?: {
+    _id: string;
+    name: string;
+  };
+  is_active?: boolean;
+}
+
+
+const galleryData: GalleryImage[] = await fetchGallery() || [];
+
+
+console.log('=== DEBUG GALERÍA ===');
+console.log('Datos de la API:', galleryData);
+console.log('Cantidad de imágenes:', galleryData.length);
+
+
+const imagenes = galleryData.map(image => {
+  console.log('Mapeando imagen:', image);
+  return {
+    src: image.image_url || '',
+    alt: image.description || "Imagen galería",
+    tipo: image.tag?.name || "sin-categoria"
+  };
+});
+
+// Obtener filtros únicos de los tags
+const filtrosUnicos = [...new Set(galleryData.map(img => img.tag?.name).filter(Boolean))] as string[];
+
+
+
+const hayImagenes = imagenes.length > 0 && imagenes.some(img => img.src && img.src !== '');
+
+---
+
+{hayImagenes ? (
+  <div class="px-4 py-10 lg:px-0 lg:py-0">
+    <GaleriaIsla imagenes={imagenes} filtros={JSON.stringify(filtrosUnicos)} client:load />
+  </div>
+) : (
+  <div class="px-4 py-10 text-center lg:px-0">
+    <p class="text-gray-500">No hay imágenes disponibles en la galería</p>
+    <p class="mt-2 text-sm text-gray-400">Datos de la API: {galleryData.length} elementos</p>
+  </div>
+)}

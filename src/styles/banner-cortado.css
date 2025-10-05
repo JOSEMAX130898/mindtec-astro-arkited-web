@@ -1,0 +1,305 @@
+.banner-cortado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 3.5rem;
+  font-size: 1.875rem;
+  color: #00ba3c;
+  background-color: #2a2a2a;
+
+  font-weight: bold;
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 100px) 100%, 0 100%);
+  position: relative;
+  margin: 0 auto;
+  max-width: 90%;
+}
+.banner-cortado-home {
+
+ 
+  font-size: 1.875rem;
+  color: #00ba3c;
+  background-color: #00ba3c;
+
+  font-weight: bold;
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 75%, calc(100% - 40px) 100%, 0 100%);
+  position: relative;
+ 
+}
+.banner-cortado-2 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 3.5rem;
+  font-size: 1.875rem;
+  color: #00ba3c;
+  background-color: #2a2a2a;
+
+  font-weight: bold;
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 100px) 100%, 0 100%);
+  position: relative;
+  margin: 0 auto;
+  max-width: 90%;
+}
+
+.banner-cortado-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+
+  color: #000000;
+  background-color: #00ba3c;
+
+  font-weight: bold;
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 50px) 100%, 0 100%);
+  position: relative;
+
+}
+
+.banner-cortado-ciclo {
+
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 80%, calc(100% - 70px) 100%, 0 100%);
+  position: relative;
+
+}
+
+.banner-cortado-blog {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 1rem 1rem;
+    font-size: 17px;
+    color: #00ba3c;
+    background-color: #2a2a2a;
+    font-family: 'Akira Expanded Demo', sans-serif;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 50px) 100%, 0 100%);
+    position: relative;
+
+  }
+
+.button-cortado {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    padding: 0.75rem 1.5rem;
+    font-size: 17px;
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 30px) 100%, 0 100%);
+    position: relative;
+    align-self: flex-end;
+    z-index: 10;
+    min-width: 200px;
+  }
+  .button-cortado-form {
+ 
+ 
+   
+    background-color: #262626;
+ 
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 90%, calc(100% - 35px) 100%, 0 100%);
+ 
+   
+  }
+
+  .button-cortado-sm {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 30px) 100%, 0 100%);
+ 
+    z-index: 10;
+
+  }
+  .button-cortado-input {
+    position: relative;
+  
+    border-radius: 0;
+    color: #2a2a2a;
+    background-color: #00ba3c;
+   z-index: 10;
+  }
+
+
+  .button-cortado-textarea {
+
+
+    color: #2a2a2a;
+    background-color: #00ba3c;
+   
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 70%, calc(100% - 20px) 100%, 0 100%);
+ 
+    z-index: 10;
+
+  }
+  .button-cortado-home {
+ 
+
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 45%, calc(100% - 20px) 100%, 0 100%);
+ 
+    z-index: 10;
+
+  }
+
+  .button-cortado-xs {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 30px) 100%, 0 100%);
+    
+    z-index: 10;
+
+  }
+
+  .button-cortado-eventos {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    padding: 0.75rem 1.5rem;
+    font-size: 17px;
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+    position: relative;
+    align-self: flex-end;
+    z-index: 10;
+ 
+  }
+
+.button-cortado-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 17px;
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%);
+    position: relative;
+    align-self: flex-end;
+    z-index: 10;
+    min-width: 200px;
+  }
+
+@media (max-width: 1024px) {
+  .banner-cortado {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    font-size: 1.875rem;
+    color: #00ba3c;
+    background-color: #2a2a2a;
+    font-family: 'Akira Expanded Demo', sans-serif;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 80px) 100%, 0 100%);
+    position: relative;
+  
+  }
+  .banner-cortado-2 {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    font-size: 1.875rem;
+    color: #00ba3c;
+    background-color: #2a2a2a;
+    font-family: 'Akira Expanded Demo', sans-serif;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 80%, calc(90% - 5px) 100%, 0 100%);
+    position: relative;
+  
+  }
+  .button-cortado {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    padding: 0.5rem 0.75rem;
+    font-size: 12px;
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 30px) 100%, 0 100%);
+    position: relative;
+    align-self: flex-end;
+    min-width: 100px;
+
+  }
+  .button-cortado-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.5rem;
+    font-size: 12px;
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%);
+    position: relative;
+    align-self: flex-end;
+    z-index: 10;
+    min-width: 100px;
+  }
+  .banner-cortado-banner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  
+  
+    color: #000000;
+    background-color: #00ba3c;
+  
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 50px) 100%, 0 100%);
+    position: relative;
+  
+  }
+  .button-cortado-home {
+ 
+
+    color: #2a2a2a;
+    background-color: #00ba3c;
+    font-weight: bold;
+    clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 45%, calc(100% - 20px) 100%, 0 100%);
+ 
+    z-index: 10;
+
+  }
+}
+
+/* Variaciones del banner cortado */
+.banner-cortado--small {
+  padding: 0.75rem 2rem;
+  font-size: 1.25rem;
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 60px) 100%, 0 100%);
+}
+
+.banner-cortado--large {
+  padding: 2rem 4rem;
+  font-size: 2.25rem;
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 120px) 100%, 0 100%);
+}
+
+.banner-cortado--reverse {
+  clip-path: polygon(100px 0, 100% 0, 100% 100%, 0 100%, 0 50%);
+}
+
+.banner-cortado--centered {
+  clip-path: polygon(50px 0, calc(100% - 50px) 0, 100% 50%, calc(100% - 50px) 100%, 50px 100%, 0 50%);
+}

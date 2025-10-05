@@ -1,0 +1,191 @@
+---
+// import astroLogo from '../assets/astro.svg';
+import arkitedLogo from '../assets/arkited.svg';
+import logoArkited from '../../public/img/logoHeader.png';
+import facebookIcon from '../assets/FACEBOOK2.svg';
+import instagramIcon from '../assets/INSTAGRAM2.svg';
+import youtubeIcon from '../assets/YOUTUBE2.svg';
+import tiktokIcon from '../assets/TIKTOK2.svg';
+import whatsappIcon from '../assets/WHATSAPP2.svg';
+
+import { getFooterInfo } from '../services/api';
+const footerData = await getFooterInfo();
+// Obtener la ruta actual para resaltar la página activa
+
+const phone = footerData.footerPhone || "";
+const phone2 = footerData.footerPhone2 || "";
+const facebook = footerData.footerFacebook || "";
+const whatsapp = footerData.footerWhatsapp || "";
+const youtube = footerData.footerYoutube || "";
+const instagram = footerData.footerInstagram || "";
+const tiktok = footerData.footerTiktok || "";
+const whatsappLink = footerData.footerWhatsapp || "";
+
+const currentPath = Astro.url.pathname;
+
+const menuItems = [
+  { name: "Nosotros", href: "/nosotros" },
+  { name: "Ciclos", href: "/ciclos" },
+  { name: "Solucionario", href: "/solucionario" },
+  { name: "Eventos", href: "/eventos" },
+  { name: "Galería", href: "/galeria" },
+  { name: "Blog", href: "/blog" },
+  { name: "Sedes", href: "/sedes" },
+  { name: "Contacto", href: "/contactanos" }
+];
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-moradoArk ">
+  <!-- Top bar -->
+  <div class="flex items-center justify-center gap-5 px-4 py-1 text-sm text-black bg-green-600 lg:justify-end lg:py-3 lg:gap-4">
+    <div class="flex items-center gap-2">
+
+      <!-- <a href="https://www.facebook.com/tallerarkited" target="_blank" class="transition-opacity hover:opacity-80">
+
+        <img src={facebookIcon.src} alt="Facebook" class="w-4 h-4 " />
+      </a>
+      <a href="https://www.instagram.com/arkited_uni/" target="_blank" class="transition-opacity hover:opacity-80">
+        <img src={instagramIcon.src} alt="Instagram" class="w-4 h-4 " />
+      </a>
+      <a href="https://www.youtube.com/channel/UCsBrVLLzYAow4yiC8BuVMuA/featured" target="_blank" class="transition-opacity hover:opacity-80">
+        <img src={youtubeIcon.src} alt="YouTube" class="w-4 h-4 " />
+      </a> -->
+      <a href={tiktok} target="_blank" class="transition-opacity hover:opacity-80"> 
+        <img src={tiktokIcon.src} alt="TikTok" class="w-4 h-4 " />
+      </a>
+       <a href={facebook} target="_blank" class="transition-opacity hover:opacity-80">
+        <img src={facebookIcon.src} alt="Facebook" class="w-4 h-4 " />
+      </a>
+      <a href={instagram} target="_blank" class="transition-opacity hover:opacity-80">
+        <img src={instagramIcon.src} alt="Instagram" class="w-4 h-4 " />
+      </a>
+      <a href={whatsappLink} target="_blank" class="transition-opacity hover:opacity-80"> 
+        <img src={whatsappIcon.src} alt="WhatsApp" class="w-4 h-4 " />
+      </a>
+      <a href={youtube} target="_blank" class="transition-opacity hover:opacity-80">
+        <img src={youtubeIcon.src} alt="YouTube" class="w-4 h-4 " />
+      </a>
+  
+    </div>
+    <span class="text-xs text-black lg:text-sm">{phone}</span>
+    <span class="text-xs text-black lg:text-sm">{phone2}</span>
+    <a href="http://intranet.edtlab.edu.pe/" target="_blank" class="font-semibold text-black hover:underline ">INTRANET</a>
+  </div>
+
+  <!-- Main navbar -->
+  <div class="flex items-center justify-between px-4 py-3 mx-auto lg:w-11/12">
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2 transition-opacity hover:opacity-80">
+      <img src={logoArkited.src} alt="Logo Arkited" class="w-1/3 lg:w-1/2"/>
+    </a>
+
+    <!-- Menú en escritorio -->
+    <nav class="hidden gap-6 text-lg font-medium text-white md:flex">
+      {menuItems.map(item => (
+        <a
+          href={item.href}
+          class={`transition-colors duration-200 ${
+            currentPath === item.href 
+              ? 'text-green-600 font-semibold' 
+              : 'hover:text-green-600'
+          }`}
+        >
+          {item.name}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Menú hamburguesa en móvil -->
+    <button class="absolute text-2xl text-verdeArk right-3 md:hidden" id="menu-toggle">
+      <svg class="h-10 w-9" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menú móvil desplegable -->
+  <div
+    class="fixed top-0 left-0 w-full h-auto transition-transform duration-300 ease-in-out transform -translate-y-full bg-white shadow-lg md:hidden"
+    id="mobile-menu"
+  >
+    <!-- Top bar verde en móvil -->
+    <div class="flex items-center justify-center gap-5 px-4 py-1 text-sm text-black bg-green-600 lg:justify-end lg:py-3 lg:gap-4">
+      <div class="flex items-center gap-2">
+        <a href={tiktok} target="_blank" class="transition-opacity hover:opacity-80">
+          <img src={tiktokIcon.src} alt="TikTok" class="w-4 h-4 " />
+        </a>
+        <a href={facebook} target="_blank" class="transition-opacity hover:opacity-80">
+          <img src={facebookIcon.src} alt="Facebook" class="w-4 h-4 " />
+        </a>
+        <a href={instagram} target="_blank" class="transition-opacity hover:opacity-80">
+          <img src={instagramIcon.src} alt="Instagram" class="w-4 h-4 " />
+        </a>
+        <a href={whatsappLink} target="_blank" class="transition-opacity hover:opacity-80"> 
+          <img src={whatsappIcon.src} alt="WhatsApp" class="w-4 h-4 " />
+        </a>
+        <a href={youtube} target="_blank" class="transition-opacity hover:opacity-80">
+          <img src={youtubeIcon.src} alt="YouTube" class="w-4 h-4 " />
+        </a>
+      </div>
+      <span class="text-xs text-black lg:text-sm">{phone}</span>
+      <span class="text-xs text-black lg:text-sm">{phone2}</span>
+      <a href="http://intranet.edtlab.edu.pe/" target="_blank" class="font-semibold text-black hover:underline ">INTRANET</a>
+    </div>
+
+    <button
+      class="absolute z-50 text-2xl text-verdeArk top-16 right-5"
+      id="close-menu"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <ul class="flex flex-col gap-6 p-10 text-2xl font-bold text-verdeArk bg-moradoArk">
+      {menuItems.map(item => (
+        <li>
+          <a
+            href={item.href}
+            class={`block transition-colors duration-200 ${
+              currentPath === item.href 
+                ? 'text-green-600 font-semibold' 
+                : 'hover:text-green-600'
+            }`}
+          >
+            {item.name}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <script type="module">
+    const toggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    const closeMenu = document.getElementById("close-menu");
+    
+    toggle.addEventListener("click", () => {
+      menu.classList.remove("-translate-y-full");
+      menu.classList.add("translate-y-0");
+    });
+    
+    closeMenu.addEventListener("click", () => {
+      menu.classList.remove("translate-y-0");
+      menu.classList.add("-translate-y-full");
+    });
+    
+    // Cerrar menú al hacer clic en un enlace
+    const mobileLinks = menu.querySelectorAll("a");
+    mobileLinks.forEach(link => {
+      link.addEventListener("click", () => {
+        menu.classList.remove("translate-y-0");
+        menu.classList.add("-translate-y-full");
+      });
+    });
+  </script>
+</nav>
+
+<!-- Spacer para compensar el navbar fijo -->
+<div class="h-16"></div>

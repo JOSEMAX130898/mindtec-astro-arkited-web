@@ -1,0 +1,37 @@
+---
+import rectangle from "../assets/Rectangle.png";
+import vector from "../../public/Vector.png";
+
+export interface Props {
+  imagen: string;
+
+  enlace?: string;
+}
+
+const { imagen, enlace } = Astro.props;
+---
+
+<div class="overflow-hidden lg:mt-0">
+  <!-- Contenido principal -->
+  <div class="w-full">
+    <div class="relative flex flex-col items-start justify-between flex-shrink-0 w-full min-w-full pt-10 lg:items-center lg:py-0 md:py-0 lg:flex-row">
+      <!-- Fondo SVG -->
+      <img src={rectangle.src} alt="Rectangle" class="absolute top-0 left-0 w-full h-full -z-10" />
+      <!-- Imagen principal -->
+      <div class="relative z-10 flex items-center justify-center order-2 w-full xl:w-8/12 md:w-1/2 lg:mb-0 lg:order-2">
+        <img src={vector.src} alt="Imagen principal" class="max-h-[300px] lg:max-h-[800px] w-auto relative" />
+      </div>
+
+      <!-- Contenido -->
+
+      <div class="flex flex-col order-1 w-auto mx-10 lg:pl-8 gap-y-7 lg:mx-20 lg:order-1">
+        <div class="flex flex-col w-auto gap-5"></div>
+      </div>
+ 
+    </div>
+
+  </div>
+  <div class="flex justify-center">
+    <img src={imagen} alt="Imagen principal" class="absolute z-10 w-3/4 lg:top-48 top-32 lg:w-auto" />
+  </div>
+</div>

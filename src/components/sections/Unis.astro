@@ -1,0 +1,223 @@
+---
+// import uni from '../../assets/uni.png';
+// import sanmarcos from '../../assets/sanmarcos.png';
+import catolica from '../../assets/catolica.png';
+import { fetchUniversities } from '../../services/api.js';
+
+interface Cycle {
+  _id: string;
+  name: string;
+  title: string;
+  slug: string;
+  newimg?: string;
+  quill?: string;
+  areas: string[];
+  view?: boolean;
+}
+
+interface Universidad {
+  _id: string;
+  nombre: string;
+  imagen: string;
+  title: string;
+  slug: string;
+  quill: string;
+  areas: string[];
+  view?: boolean;
+}
+
+
+const universitiesData: Cycle[] = await fetchUniversities();
+
+
+const universidades: Universidad[] = universitiesData.length > 0
+  ? universitiesData
+      .filter((cycle: Cycle) => cycle.view !== false) // Mostrar si view es true o no existe
+      .map((cycle: Cycle) => ({
+        _id: cycle._id,
+        nombre: cycle.name,
+        imagen: cycle.newimg || catolica.src, 
+        title: cycle.title,
+        slug: cycle.slug,
+        quill: cycle.quill || '',
+        areas: cycle.areas || [],
+        view: cycle.view
+      }))
+  : [
+      { _id: 'default', nombre: 'Universidad', imagen: catolica.src, title: 'Ciclo', slug: 'default', quill: '', areas: [], view: true }
+    ];
+
+// Calcular el número de columnas dinámicamente
+const numUniversidades = universidades.length;
+const maxColsDesktop = Math.min(numUniversidades, 4);
+const maxColsMobile = Math.min(numUniversidades, 2);
+
+// Generar las clases CSS dinámicamente
+const getGridClasses = () => {
+  let gridClasses = 'grid items-center w-full max-w-5xl gap-8 ';
+  
+  // Mobile: máximo 2 columnas
+  gridClasses += ` grid-cols-${Math.min(numUniversidades, 1)}`;
+  
+  // Tablet: máximo 3 columnas
+  if (numUniversidades >= 3) {
+    gridClasses += ' md:grid-cols-3';
+  } else {
+    gridClasses += ` md:grid-cols-${numUniversidades}`;
+  }
+  
+  // Desktop: máximo 4 columnas
+  if (numUniversidades >= 4) {
+    gridClasses += ' lg:grid-cols-4';
+  } else {
+    gridClasses += ` lg:grid-cols-${numUniversidades}`;
+  }
+  
+  return gridClasses;
+};
+
+const gridClasses = getGridClasses();
+---
+
+<style>
+  .uni-card.selected {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.1), rgba(34, 197, 94, 0.1));
+  }
+  
+  .uni-card.selected .font-bebas {
+    color: #8B4513;
+    font-weight: bold;
+  }
+  
+  .uni-card.selected img {
+    transform: scale(1.1);
+  }
+</style>
+
+<div class="flex justify-center w-full lg:pt-20 lg:pb-10">
+  <div class={gridClasses}>
+    {universidades.map((u: Universidad, i: number) => (
+      <div 
+        class="flex flex-col items-center py-5 transition-all duration-300 cursor-pointer group uni-card hover:scale-105"
+        data-university-id={u._id}
+        data-university-areas={JSON.stringify(u.areas)}
+        data-university-quill={u.quill || ''}
+      >
+        <p class="mt-4 text-2xl transition-all duration-300 text-moradoArk font-bebas group-hover:scale-150">{u.title}</p>
+        <img 
+          src={u.imagen} 
+          alt={u.nombre} 
+          class="object-contain h-40 mx-auto transition-all duration-300 transform lg:my-5 group-hover:scale-110" 
+        />
+             <a 
+            
+            class=" flex items-center gap-2 px-6 py-1 !text-lg font-medium transition-opacity button-cortado-sm !bg-moradoArk hover:opacity-90 !text-verdeArk"
+          >
+            <span class="font-akira-bold">+</span>
+            <span class="font-akira-bold">Info</span>
+          </a>
+       
+        {/* <p class="mt-4 text-2xl transition-all duration-300 text-verdeArk">{u.nombre}</p>
+        <p class="text-xl text-gray-600 transition-all duration-300">{u.title}</p> */}
+      </div>
+    ))}
+  </div>
+
+</div>
+<div id="quill-content" class="max-w-4xl mx-auto text-left transition-all duration-300 transform scale-95">
+  <div id="quill-text" class="text-gray-700"></div>
+</div>
+<!-- Contenido quill que aparece al hacer click -->
+
+<script>
+  // Función para manejar la selección de universidad
+  function handleUniversitySelection(universityId: string, areas: string[], quillContent: string) {
+    console.log('Universidad seleccionada:', universityId);
+    console.log('Áreas:', areas);
+    
+    // Remover selección anterior
+    document.querySelectorAll('.uni-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    
+    // Agregar selección a la tarjeta actual
+    const selectedCard = document.querySelector(`[data-university-id="${universityId}"]`);
+    if (selectedCard) {
+      selectedCard.classList.add('selected');
+    }
+    
+    // Mostrar contenido quill si existe
+    if (quillContent) {
+      showQuillContent(quillContent);
+    } else {
+      hideQuillContent();
+    }
+    
+    // Disparar evento personalizado para que Descarga.astro pueda escucharlo
+    const event = new CustomEvent('universitySelected', {
+      detail: {
+        universityId,
+        areas
+      }
+    });
+    document.dispatchEvent(event);
+  }
+  
+  // Función para mostrar contenido quill
+  function showQuillContent(quillContent: string) {
+    const quillElement = document.getElementById('quill-content');
+    const quillTextElement = document.getElementById('quill-text');
+    
+    if (quillElement && quillTextElement && quillContent) {
+      quillTextElement.innerHTML = quillContent;
+      quillElement.classList.remove('opacity-0', 'scale-95');
+      quillElement.classList.add('opacity-100', 'scale-100');
+    }
+  }
+  
+  // Función para ocultar contenido quill
+  function hideQuillContent() {
+    const quillElement = document.getElementById('quill-content');
+    
+    if (quillElement) {
+      quillElement.classList.remove('opacity-100', 'scale-100');
+      quillElement.classList.add('opacity-0', 'scale-95');
+    }
+  }
+
+  // Agregar event listeners a todas las tarjetas de universidad
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.uni-card').forEach(card => {
+      // Click para selección y mostrar quill
+      card.addEventListener('click', () => {
+        const universityId = card.getAttribute('data-university-id');
+        const areasData = card.getAttribute('data-university-areas');
+        const quillData = card.getAttribute('data-university-quill');
+        
+        if (universityId) {
+          const areas = areasData ? JSON.parse(areasData) : [];
+          const quillContent = quillData || '';
+          handleUniversitySelection(universityId, areas, quillContent);
+        }
+      });
+    });
+    
+    // Seleccionar la primera universidad por defecto
+    const firstCard = document.querySelector('.uni-card');
+    if (firstCard) {
+      const universityId = firstCard.getAttribute('data-university-id');
+      const areasData = firstCard.getAttribute('data-university-areas');
+      const quillData = firstCard.getAttribute('data-university-quill');
+      
+      if (universityId) {
+        const areas = areasData ? JSON.parse(areasData) : [];
+        const quillContent = quillData || '';
+        handleUniversitySelection(universityId, areas, quillContent);
+      }
+    }
+  });
+</script>
+

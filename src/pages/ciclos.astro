@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BannerPrincipal from '../components/BannerPrincipal.astro';
+import CiclosPrincipal from '../../public/ciclos.png';
+import TipoCiclo from '../components/sections/TipoCiclo.astro';
+import Solucionarios from '../components/sections/Solucionarios.astro';
+
+
+---
+
+<Layout title="Ciclos - Arkited">
+  <BannerPrincipal 
+    titulo="NUESTROS" 
+    titulo2="CICLOS"
+    imagen={CiclosPrincipal.src} 
+
+  />
+  <TipoCiclo/>
+   <Solucionarios/>
+</Layout> 

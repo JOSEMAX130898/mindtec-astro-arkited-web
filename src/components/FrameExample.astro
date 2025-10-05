@@ -1,0 +1,29 @@
+---
+import Frame from './Frame.astro';
+
+// Ejemplo de uso con datos personalizados (mezclando letras e imágenes)
+const customSections = [
+  {
+    letter: "1",
+    title: "NUESTRO MÉTODO",
+    description: "Utilizamos técnicas innovadoras de enseñanza que combinan teoría y práctica para garantizar el mejor aprendizaje.",
+    letterColor: "text-blue-500"
+  },
+  {
+    letter: "2", 
+    title: "PROFESORES EXPERTOS",
+    description: "Nuestro equipo de profesores está formado por arquitectos profesionales con amplia experiencia en la docencia.",
+    letterColor: "text-purple-500",
+    imageSrc: "/B.png" // Usar imagen en lugar de letra
+  },
+  {
+    letter: "3",
+    title: "RESULTADOS GARANTIZADOS",
+    description: "El 95% de nuestros estudiantes aprueban el examen de admisión en su primer intento gracias a nuestra metodología.",
+    letterColor: "text-orange-500"
+  }
+];
+---
+
+<!-- Ejemplo de uso del componente Frame con datos personalizados -->
+<Frame sections={customSections} />

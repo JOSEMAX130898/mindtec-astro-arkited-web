@@ -1,0 +1,178 @@
+---
+import galeria1 from '../../assets/galeria1.png';
+import galeria2 from '../../assets/galeria2.png';
+import { fetchBlog, fetchWebInfo } from '../../services/api.js';
+
+interface BlogPost {
+  _id: string;
+  title?: string;
+  excerpt?: string;
+  author?: string;
+  content?: string;
+  imageUrl?: string;
+  published_at?: string;
+  created_at?: string;
+  category?: string;
+  status?: number;
+  urlName?: string;
+  date?: string;
+  time?: string;
+}
+
+interface WebInfo {
+  blogTitle?: string;
+  blogTitle2?: string;
+  blogSubtitle?: string;
+  blogImage?: string;
+}
+
+// Obtener datos del blog y webinfo desde la API
+const blogData: BlogPost[] = await fetchBlog() || [];
+const webInfoData = await fetchWebInfo('arkited', ['blogTitle', 'blogTitle2', 'blogSubtitle', 'blogImage']);
+
+// Función para verificar si un post debe mostrarse (publicado o sin fecha específica)
+function shouldShowPost(post: BlogPost): boolean {
+  // Si no hay fecha, mostrar el post
+  if (!post.date) {
+    return true;
+  }
+  
+  const now = new Date();
+  let postDate: Date;
+  
+  // Si hay fecha pero no hora, usar las 00:00:00 del día
+  if (post.date && !post.time) {
+    postDate = new Date(`${post.date}T00:00:00`);
+  } else if (post.date && post.time) {
+    // Si hay fecha y hora, usar ambos
+    postDate = new Date(`${post.date}T${post.time}`);
+  } else {
+    // Si no hay fecha, mostrar el post
+    return true;
+  }
+  
+  // Mostrar si la fecha del post es menor o igual a la fecha actual (ya publicado)
+  return postDate <= now;
+}
+
+// Filtrar posts que deben mostrarse (publicados o sin fecha)
+const publishedPosts = blogData.filter(shouldShowPost);
+
+// Debug: Ver qué datos trae la API
+console.log('=== DEBUG BLOG ===');
+console.log('Datos del blog originales:', blogData);
+console.log('Posts filtrados (publicados):', publishedPosts);
+console.log('Datos de webinfo:', webInfoData);
+
+// Formatear webinfo como en blog.jsx
+const webInfo: WebInfo = webInfoData.reduce((acc: WebInfo, item: any) => {
+  (acc as any)[item.field] = item.info;
+  return acc;
+}, {} as WebInfo);
+
+// Mapear los datos del blog a la estructura que necesita el componente
+const posts = publishedPosts.map(post => ({
+  img: post.imageUrl || '',
+  titulo: post.title || '',
+  fecha: post.published_at ? new Date(post.published_at).toLocaleDateString('es-ES') : '',
+  texto: post.excerpt || post.content || '',
+  urlName: post.urlName || '',
+  category: post.category || '',
+  excerpt: post.excerpt || '',
+  content: post.content || '',
+  date: post.date || '',
+  time: post.time || '',
+}));
+
+// Obtener categorías únicas de los posts
+const categorias = [...new Set(posts.map(post => post.category).filter(cat => cat && cat.trim() !== ''))];
+
+console.log('Posts mapeados:', posts);
+console.log('Cantidad de posts:', posts.length);
+console.log('Primer post:', posts[0]);
+console.log('Categorías encontradas:', categorias);
+
+// Verificar si hay posts antes de renderizar
+const hayPosts = posts.length > 0 && posts.some(post => post.img && post.img !== '');
+console.log('¿Hay posts válidos?', hayPosts);
+---
+
+{hayPosts ? (
+  <div class="w-full px-6 py-6 lg:px-0">
+    <div class="w-full mx-auto max-w-7xl">
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <!-- Columna izquierda: Artículo principal grande -->
+        <div class="space-y-6">
+        
+       <div>
+        <p class="text-4xl font-normal underline text-verdeArk">{posts[0].titulo}</p>
+        <p class="text-lg text-gray-500">{posts[0].fecha}</p>
+       </div>
+           
+          
+          <!-- Artículo principal grande -->
+          {posts.length > 0 && (
+            <a href={`/blog/${posts[0].urlName}`} class="block">
+              <div class=" overflow-hidden h-[500px] flex flex-col gap-2 justify-end cursor-pointer">
+                <img src={posts[0].img} alt={posts[0].titulo} class="inset-0 object-cover w-full h-full" />
+                 <div class="">
+                   <div class="text-2xl font-semibold" set:html={posts[0].excerpt}>
+                   </div>
+                 </div>
+             {/* <div class="relative z-10 banner-cortado-blog">
+                  <p class="text-2xl font-semibold">{posts[0].titulo}</p>
+                  <p class="mt-2 text-base">{posts[0].fecha}</p>
+                </div> */}
+              </div>
+            </a>
+                     <a href={`/blog/${posts[0].urlName}`} class="text-lg font-normal underline transition-colors text-verdeArk hover:text-opacity-80">Ver el articulo completo</a>
+            
+          )}
+        </div>
+        
+        <!-- Columna derecha: Categorías y artículos pequeños -->
+        <div class="space-y-6">
+          <!-- Categorías -->
+          <div class="px-6 rounded-lg ">
+       
+            <div class="flex flex-wrap gap-2">
+              {categorias.length > 0 ? (
+                categorias.map((categoria, i) => (
+                  <button class="py-2 pl-3 pr-5 text-lg text-white transition-colors rounded bg-verdeArk hover:bg-opacity-90 button-cortado-sm">
+                    {categoria}
+                  </button>
+                ))
+              ) : (
+                <p class="text-sm text-gray-500">No hay categorías disponibles</p>
+              )}
+            </div>
+          </div>
+          
+          <!-- Te puede interesar - Grid 2x2 -->
+          <div class="px-6 rounded-lg ">
+           
+            <div class="grid grid-cols-2 gap-4">
+              {posts.slice(1, 5).map((post, i) => (
+                <a href={`/blog/${post.urlName}`} class="block">
+                  <div class="relative overflow-hidden shadow-md h-[150px] flex flex-col justify-end cursor-pointer transition-transform hover:scale-105">
+                    <img src={post.img} alt={post.titulo} class="absolute inset-0 object-cover w-full h-full" />
+                    <div class="relative z-10 p-2 bg-[#2a2a2a] bg-opacity-90">
+                      <p class="text-xs font-semibold text-verdeArk line-clamp-2">{post.titulo}</p>
+                      <p class="mt-1 text-xs text-verdeArk">{post.fecha}</p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+) : (
+  <div class="py-10 text-center">
+    <p class="text-gray-500">No hay posts disponibles en el blog</p>
+    <p class="mt-2 text-sm text-gray-400">Datos de la API: {blogData.length} elementos</p>
+    <p class="text-sm text-gray-400">Posts mapeados: {posts.length} elementos</p>
+  </div>
+)}

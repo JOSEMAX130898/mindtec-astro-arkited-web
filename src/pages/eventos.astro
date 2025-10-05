@@ -1,0 +1,30 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Calendar from "../islands/Calendar.jsx";
+import BannerPrincipal from "../components/BannerPrincipal.astro";
+import Banner from "../assets/BannerEventos.png";
+import { getEventosInfo } from "../services/api.js";
+
+const eventosData = await getEventosInfo();
+
+const titulo = eventosData.eventTitle || eventosData.eventTitle2 || "Eventos";
+const subtitulo = eventosData.eventSubtitle || "";
+const imagen = eventosData.eventImage || Banner.src;
+const titulo2 = eventosData.eventTitle2;
+---
+
+<Layout title="Eventos - Arkited">
+  <div>
+    <BannerPrincipal 
+      titulo={titulo}
+      subtitulo={subtitulo}
+      titulo2={titulo2}
+      imagen={imagen} 
+    />
+
+    <div class="w-11/12 pb-10 m-auto lg:w-3/4">
+      <Calendar client:load />
+    </div>
+  </div>
+</Layout>
+

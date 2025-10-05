@@ -1,0 +1,38 @@
+---
+interface Props {
+  image?: string;
+  title?: string;
+  paragraph?: string;
+  color?: string;
+}
+
+const { image, title, paragraph, color = "bg-moradoArk" } = Astro.props;
+---
+
+<section class={`${color} py-16 lg:py-24`}>
+  <div class="container px-4 mx-auto">
+    <div class="grid items-center gap-8 lg:grid-cols-2">
+      <div class="text-white">
+        {title && (
+          <h1 class="mb-6 text-4xl font-bold lg:text-6xl">
+            {title}
+          </h1>
+        )}
+        {paragraph && (
+          <p class="text-lg lg:text-xl opacity-90">
+            {paragraph}
+          </p>
+        )}
+      </div>
+      {image && (
+        <div class="flex justify-center lg:justify-end">
+          <img 
+            src={image} 
+            alt="Eventos" 
+            class="h-auto max-w-full rounded-lg shadow-lg"
+          />
+        </div>
+      )}
+    </div>
+  </div>
+</section> 
